@@ -1,0 +1,1435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Study Planner</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Roboto:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+</head>
+<body>
+
+    <div class="app-container">
+        <header class="app-header">
+            <div class="header-left">
+                <i class="fas fa-sun toggle-theme-btn" id="themeToggle"></i>
+            </div>
+            <div class="header-center">
+                <h1 class="app-title">Study Planner</h1>
+            </div>
+            <div class="header-right">
+                <i class="fas fa-calculator toggle-calculator-btn" id="calculatorToggle"></i>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <section id="dashboard-view" class="view active">
+                <h2 class="section-title">Dashboard</h2>
+
+                <div class="dashboard-card todo-card">
+                    <h3 class="subsection-title">My To-Do List</h3>
+                    <ul class="todo-list" id="todo-list">
+                        <li class="no-items">
+                            <p>No tasks yet! Time to add some new study goals.</p>
+                            <button class="primary-btn small-btn" data-view="add-task-view">Add First Task</button>
+                        </li>
+                        </ul>
+                    <button class="primary-btn" data-view="add-task-view">Add New Task</button>
+                </div>
+
+                <div class="dashboard-card pomodoro-card" id="pomodoro-section">
+                    <h3 class="subsection-title">Pomodoro Timer</h3>
+                    <div class="timer-display" id="pomodoro-timer-display">25:00</div>
+                    <div class="timer-controls">
+                        <button class="primary-btn small-btn" id="pomodoro-start-btn">Start</button>
+                        <button class="secondary-btn small-btn" id="pomodoro-reset-btn">Reset</button>
+                    </div>
+                    <div class="pomodoro-config">
+                        <label for="work-duration">Work (mins):</label>
+                        <input type="number" id="work-duration" value="25" min="1">
+                        <label for="short-break-duration">Short Break (mins):</label>
+                        <input type="number" id="short-break-duration" value="5" min="1">
+                        <label for="long-break-duration">Long Break (mins):</label>
+                        <input type="number" id="long-break-duration" value="15" min="1">
+                    </div>
+                    <p class="pomodoro-sessions">Completed Sessions: <span id="completed-sessions-count">0</span></p>
+                    <audio id="pomodoro-alert-sound" src="https://www.soundjay.com/misc/sounds/bell-ring-01.mp3" preload="auto"></audio>
+                </div>
+            </section>
+
+            <section id="add-task-view" class="view">
+                <h2 class="section-title">Add New Task</h2>
+                <form id="task-form" class="task-form">
+                    <input type="hidden" id="task-id">
+                    <div class="form-group">
+                        <label for="task-description">Task Description</label>
+                        <input type="text" id="task-description" placeholder="e.g., Complete Math assignment" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="task-due-date">Due Date</label>
+                        <input type="date" id="task-due-date" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="task-priority">Priority</label>
+                        <select id="task-priority" required>
+                            <option value="low">Low</option>
+                            <option value="medium" selected>Medium</option>
+                            <option value="high">High</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="task-recurrence">Repeat</label>
+                        <select id="task-recurrence">
+                            <option value="none">None</option>
+                            <option value="daily">Daily</option>
+                            <option value="weekly">Weekly</option>
+                            <option value="monthly">Monthly</option>
+                        </select>
+                    </div>
+                    <div class="form-group subtasks-group">
+                        <label>Subtasks</label>
+                        <div id="subtasks-container">
+                            </div>
+                        <button type="button" class="secondary-btn small-btn" id="add-subtask-btn">Add Subtask</button>
+                    </div>
+                    <button type="submit" class="primary-btn" id="save-task-btn">Add Task</button>
+                    <button type="button" class="secondary-btn back-to-dashboard-btn">Cancel</button>
+                </form>
+            </section>
+
+            <section id="notes-view" class="view">
+                <h2 class="section-title">My Notes</h2>
+
+                <div class="notes-section">
+                    <h3 class="subsection-title">Subjects</h3>
+                    <ul id="subject-list" class="category-list">
+                        <li class="no-items">
+                            <p>No subjects yet. Organize your notes!</p>
+                            <button class="primary-btn small-btn" id="add-first-subject-btn">Add First Subject</button>
+                        </li>
+                        </ul>
+                    <div class="add-category-section">
+                        <input type="text" id="new-subject-name" placeholder="New subject name" class="new-category-input">
+                        <button id="add-new-subject-btn" class="primary-btn">Add Subject</button>
+                    </div>
+
+                    <h3 class="subsection-title">Text Notes</h3>
+                    <form id="text-note-form" class="notes-form">
+                        <input type="hidden" id="text-note-id">
+                        <div class="form-group">
+                            <label for="text-note-title">Note Title</label>
+                            <input type="text" id="text-note-title" placeholder="e.g., Biology Chapter 3 Summary" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="text-note-subject">Subject</label>
+                            <select id="text-note-subject">
+                                <option value="">Select a subject</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="text-note-content">Note Content</label>
+                            <textarea id="text-note-content" rows="6" placeholder="Start typing your notes here..."></textarea>
+                        </div>
+                        <button type="submit" class="primary-btn" id="save-text-note-btn">Save Note</button>
+                        <button type="button" class="secondary-btn" id="clear-text-note-btn">Clear Form</button>
+                    </form>
+                    <ul id="text-notes-list" class="transaction-list">
+                        <li class="no-items">
+                            <p>No text notes yet. Jot down some thoughts!</p>
+                            <button class="primary-btn small-btn" id="add-first-text-note-btn">Add First Note</button>
+                        </li>
+                        </ul>
+
+                    <h3 class="subsection-title">PDF Notes by Subject</h3>
+                    <div class="form-group">
+                        <label for="pdf-subject-select">Select Subject</label>
+                        <select id="pdf-subject-select">
+                            <option value="">Select a subject</option>
+                            </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="pdf-upload">Upload PDF Note</label>
+                        <input type="file" id="pdf-upload" accept=".pdf">
+                    </div>
+                    <button class="primary-btn" id="upload-pdf-btn">Upload Note</button>
+
+                    <h3 class="subsection-title">Uploaded PDFs</h3>
+                    <ul id="uploaded-notes-list" class="transaction-list">
+                        <li class="no-items">
+                            <p>No PDFs uploaded yet. Keep your study materials organized!</p>
+                            <button class="primary-btn small-btn" id="upload-first-pdf-btn">Upload First PDF</button>
+                        </li>
+                        </ul>
+                </div>
+            </section>
+
+            <section id="timetable-view" class="view">
+                <h2 class="section-title">My Timetable</h2>
+                <div class="timetable-controls">
+                    <button id="prev-week-btn" class="icon-btn"><i class="fas fa-chevron-left"></i></button>
+                    <span id="current-week-display" class="month-display"></span>
+                    <button id="next-week-btn" class="icon-btn"><i class="fas fa-chevron-right"></i></button>
+                </div>
+
+                <div class="timetable-grid" id="timetable-grid">
+                    </div>
+
+                <button class="primary-btn" id="add-schedule-item-btn">Add Schedule Item</button>
+            </section>
+
+            <section id="add-schedule-item-view" class="view">
+                <h2 class="section-title">Add/Edit Schedule Item</h2>
+                <form id="schedule-item-form" class="expense-form">
+                    <input type="hidden" id="schedule-item-id">
+                    <div class="form-group">
+                        <label for="schedule-title">Title</label>
+                        <input type="text" id="schedule-title" placeholder="e.g., Biology Lecture" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="schedule-day">Day of Week</label>
+                        <select id="schedule-day" required>
+                            <option value="Monday">Monday</option>
+                            <option value="Tuesday">Tuesday</option>
+                            <option value="Wednesday">Wednesday</option>
+                            <option value="Thursday">Thursday</option>
+                            <option value="Friday">Friday</option>
+                            <option value="Saturday">Saturday</option>
+                            <option value="Sunday">Sunday</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="schedule-start-time">Start Time</label>
+                        <input type="time" id="schedule-start-time" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="schedule-end-time">End Time</label>
+                        <input type="time" id="schedule-end-time" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="schedule-color">Color</label>
+                        <input type="color" id="schedule-color" value="#00BCD4">
+                    </div>
+                    <div class="form-group">
+                        <label for="schedule-notes">Notes (Optional)</label>
+                        <textarea id="schedule-notes" rows="3" placeholder="e.g., Room 301"></textarea>
+                    </div>
+                    <button type="submit" class="primary-btn" id="save-schedule-item-btn">Save Item</button>
+                    <button type="button" class="secondary-btn back-to-timetable-btn">Cancel</button>
+                </form>
+            </section>
+
+
+            <section id="backup-view" class="view">
+                <h2 class="section-title">Data Backup & Restore</h2>
+                <div class="backup-restore-actions">
+                    <button class="primary-btn" id="backup-data-btn">
+                        <i class="fas fa-download"></i>
+                        <span>Backup Data</span>
+                    </button>
+                    <button class="secondary-btn" id="restore-data-btn">
+                        <i class="fas fa-upload"></i>
+                        <span>Restore Data</span>
+                    </button>
+                </div>
+            </section>
+
+        </main>
+
+        <div id="calculator" class="calculator-container" style="display: none;">
+            <div class="calculator-display">
+                <input type="text" id="calc-output" readonly value="0">
+            </div>
+            <div class="calculator-buttons">
+                <button class="calc-btn clear" data-action="clear">C</button>
+                <button class="calc-btn operator" data-action="divide">/</button>
+                <button class="calc-btn operator" data-action="multiply">*</button>
+                <button class="calc-btn backspace" data-action="backspace"><i class="fas fa-backspace"></i></button>
+
+                <button class="calc-btn number">7</button>
+                <button class="calc-btn number">8</button>
+                <button class="calc-btn number">9</button>
+                <button class="calc-btn operator" data-action="subtract">-</button>
+
+                <button class="calc-btn number">4</button>
+                <button class="calc-btn number">5</button>
+                <button class="calc-btn number">6</button>
+                <button class="calc-btn operator" data-action="add">+</button>
+
+                <button class="calc-btn number">1</button>
+                <button class="calc-btn number">2</button>
+                <button class="calc-btn number">3</button>
+                <button class="calc-btn equals" data-action="equals">=</button>
+
+                <button class="calc-btn number zero">0</button>
+                <button class="calc-btn number decimal">.</button>
+                <button class="calc-btn apply-calc" data-action="apply">Apply</button>
+            </div>
+        </div>
+
+        <nav class="bottom-nav">
+            <button class="nav-item active" data-view="dashboard-view">
+                <i class="fas fa-home"></i>
+                <span>Home</span>
+            </button>
+            <button class="nav-item" data-view="add-task-view">
+                <i class="fas fa-plus-circle"></i>
+                <span>Add Task</span>
+            </button>
+            <button class="nav-item" data-view="notes-view">
+                <i class="fas fa-book"></i>
+                <span>Notes</span>
+            </button>
+            <button class="nav-item" data-view="timetable-view">
+                <i class="fas fa-calendar-alt"></i>
+                <span>Timetable</span>
+            </button>
+            <button class="nav-item" data-view="backup-view">
+                <i class="fas fa-database"></i>
+                <span>Backup</span>
+            </button>
+        </nav>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- DOM Elements ---
+            const appContainer = document.querySelector('.app-container');
+            const mainContent = document.querySelector('.main-content');
+            const navItems = document.querySelectorAll('.bottom-nav .nav-item');
+            const views = document.querySelectorAll('.view');
+            const backToDashboardBtns = document.querySelectorAll('.back-to-dashboard-btn');
+            const backToTimetableBtn = document.querySelector('.back-to-timetable-btn');
+
+            // Dashboard elements
+            const todoListUl = document.getElementById('todo-list');
+
+            // Pomodoro elements
+            const pomodoroSection = document.getElementById('pomodoro-section');
+            const pomodoroTimerDisplay = document.getElementById('pomodoro-timer-display');
+            const pomodoroStartBtn = document.getElementById('pomodoro-start-btn');
+            const pomodoroResetBtn = document.getElementById('pomodoro-reset-btn');
+            const workDurationInput = document.getElementById('work-duration');
+            const shortBreakDurationInput = document.getElementById('short-break-duration');
+            const longBreakDurationInput = document.getElementById('long-break-duration');
+            const completedSessionsCountSpan = document.getElementById('completed-sessions-count');
+            const pomodoroAlertSound = document.getElementById('pomodoro-alert-sound');
+
+            // Add Task elements
+            const taskForm = document.getElementById('task-form');
+            const taskIdInput = document.getElementById('task-id');
+            const taskDescriptionInput = document.getElementById('task-description');
+            const taskDueDateInput = document.getElementById('task-due-date');
+            const taskPrioritySelect = document.getElementById('task-priority');
+            const taskRecurrenceSelect = document.getElementById('task-recurrence');
+            const subtasksContainer = document.getElementById('subtasks-container');
+            const addSubtaskBtn = document.getElementById('add-subtask-btn');
+            const saveTaskBtn = document.getElementById('save-task-btn');
+
+            // Notes elements
+            const subjectListUl = document.getElementById('subject-list');
+            const newSubjectInput = document.getElementById('new-subject-name');
+            const addNewSubjectBtn = document.getElementById('add-new-subject-btn');
+            const pdfSubjectSelect = document.getElementById('pdf-subject-select');
+            const pdfUploadInput = document.getElementById('pdf-upload');
+            const uploadPdfBtn = document.getElementById('upload-pdf-btn');
+            const uploadedNotesListUl = document.getElementById('uploaded-notes-list');
+
+            // Text Note elements
+            const textNoteForm = document.getElementById('text-note-form');
+            const textNoteIdInput = document.getElementById('text-note-id');
+            const textNoteTitleInput = document.getElementById('text-note-title');
+            const textNoteSubjectSelect = document.getElementById('text-note-subject');
+            const textNoteContentInput = document.getElementById('text-note-content');
+            const saveTextNoteBtn = document.getElementById('save-text-note-btn');
+            const clearTextNoteBtn = document.getElementById('clear-text-note-btn');
+            const textNotesListUl = document.getElementById('text-notes-list');
+
+            // Timetable elements
+            const prevWeekBtn = document.getElementById('prev-week-btn');
+            const nextWeekBtn = document.getElementById('next-week-btn');
+            const currentWeekDisplay = document.getElementById('current-week-display');
+            const timetableGrid = document.getElementById('timetable-grid');
+            const addScheduleItemBtn = document.getElementById('add-schedule-item-btn');
+
+            // Add/Edit Schedule Item Form elements
+            const scheduleItemForm = document.getElementById('schedule-item-form');
+            const scheduleItemIdInput = document.getElementById('schedule-item-id');
+            const scheduleTitleInput = document.getElementById('schedule-title');
+            const scheduleDaySelect = document.getElementById('schedule-day');
+            const scheduleStartTimeInput = document.getElementById('schedule-start-time');
+            const scheduleEndTimeInput = document.getElementById('schedule-end-time');
+            const scheduleColorInput = document.getElementById('schedule-color');
+            const scheduleNotesInput = document.getElementById('schedule-notes');
+            const saveScheduleItemBtn = document.getElementById('save-schedule-item-btn');
+
+            // Backup/Restore buttons
+            const backupDataBtn = document.getElementById('backup-data-btn');
+            const restoreDataBtn = document.getElementById('restore-data-btn');
+
+            // Theme toggle
+            const themeToggleBtn = document.getElementById('themeToggle');
+
+            // Calculator Elements
+            const calculatorToggleBtn = document.getElementById('calculatorToggle');
+            const calculatorContainer = document.getElementById('calculator');
+            const calcOutput = document.getElementById('calc-output');
+            const calcButtons = calculatorContainer.querySelector('.calculator-buttons');
+            let currentInput = '0';
+            let firstOperand = null;
+            let operator = null;
+            let waitingForSecondOperand = false;
+
+
+            // --- Data Storage (Using localStorage) ---
+            let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+            let subjects = JSON.parse(localStorage.getItem('subjects')) || ['Mathematics', 'Physics', 'Chemistry', 'Biology'];
+            let uploadedNotes = JSON.parse(localStorage.getItem('uploadedNotes')) || []; // Stores metadata, not actual files
+            let textNotes = JSON.parse(localStorage.getItem('textNotes')) || [];
+            let scheduleItems = JSON.parse(localStorage.getItem('scheduleItems')) || [];
+            let pomodoroConfig = JSON.parse(localStorage.getItem('pomodoroConfig')) || {
+                work: 25, shortBreak: 5, longBreak: 15, completedSessions: 0
+            };
+            let currentTheme = localStorage.getItem('theme') || 'light';
+
+
+            // --- Utility Functions ---
+            function generateId() {
+                return Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
+            }
+
+            function saveData() {
+                localStorage.setItem('tasks', JSON.stringify(tasks));
+                localStorage.setItem('subjects', JSON.stringify(subjects));
+                localStorage.setItem('uploadedNotes', JSON.stringify(uploadedNotes));
+                localStorage.setItem('textNotes', JSON.stringify(textNotes));
+                localStorage.setItem('scheduleItems', JSON.stringify(scheduleItems));
+                localStorage.setItem('pomodoroConfig', JSON.stringify(pomodoroConfig));
+            }
+
+            function formatDate(dateString) {
+                const options = { year: 'numeric', month: 'short', day: 'numeric' };
+                return new Date(dateString).toLocaleDateString(undefined, options);
+            }
+
+            // --- Notifications ---
+            function requestNotificationPermission() {
+                if (!("Notification" in window)) {
+                    console.log("This browser does not support desktop notification");
+                    return;
+                }
+                if (Notification.permission !== "granted" && Notification.permission !== "denied") {
+                    Notification.requestPermission().then(permission => {
+                        if (permission === "granted") {
+                            console.log("Notification permission granted.");
+                        } else {
+                            console.warn("Notification permission denied.");
+                        }
+                    });
+                }
+            }
+
+            function showNotification(title, body) {
+                if (Notification.permission === "granted") {
+                    new Notification(title, { body: body, icon: 'https://img.icons8.com/color/48/000000/study.png' });
+                }
+            }
+
+
+            // --- Initial Setup Functions ---
+            function initializeApp() {
+                applyTheme(currentTheme);
+                populateSubjectSelects();
+                displayTasks();
+                displaySubjectsList();
+                displayUploadedNotes();
+                displayTextNotes();
+                populateTimetableGrid();
+                calculatorContainer.style.display = 'none';
+                resetCalculator();
+                taskDueDateInput.valueAsDate = new Date(); // Set default due date
+                loadPomodoroConfig();
+                requestNotificationPermission(); // Ask for notification permission
+            }
+
+            function applyTheme(theme) {
+                if (theme === 'dark') {
+                    document.body.classList.add('dark-theme');
+                    themeToggleBtn.classList.remove('fa-sun');
+                    themeToggleBtn.classList.add('fa-moon');
+                } else {
+                    document.body.classList.remove('dark-theme');
+                    themeToggleBtn.classList.remove('fa-moon');
+                    themeToggleBtn.classList.add('fa-sun');
+                }
+                currentTheme = theme;
+                localStorage.setItem('theme', theme);
+            }
+
+            function switchView(viewId) {
+                views.forEach(view => {
+                    view.classList.remove('active');
+                });
+                document.getElementById(viewId).classList.add('active');
+                navItems.forEach(item => {
+                    if (item.dataset.view === viewId) {
+                        item.classList.add('active');
+                    } else {
+                        item.classList.remove('active');
+                    }
+                });
+
+                // Specific actions on view switch
+                if (viewId === 'dashboard-view') {
+                    displayTasks();
+                } else if (viewId === 'notes-view') {
+                    populateSubjectSelects();
+                    displaySubjectsList();
+                    displayTextNotes();
+                    displayUploadedNotes();
+                } else if (viewId === 'add-task-view') {
+                    resetTaskForm();
+                } else if (viewId === 'timetable-view') {
+                    populateTimetableGrid();
+                }
+            }
+
+
+            // --- Dashboard: To-Do List Functionality ---
+            function displayTasks() {
+                todoListUl.innerHTML = '';
+                const activeTasks = tasks.filter(t => !t.completed); // Show only active tasks initially
+
+                if (activeTasks.length === 0) {
+                    const li = document.createElement('li');
+                    li.classList.add('no-items');
+                    li.innerHTML = `<p>No tasks yet! Time to add some new study goals.</p>
+                                    <button class="primary-btn small-btn" data-view="add-task-view">Add First Task</button>`;
+                    todoListUl.appendChild(li);
+                    li.querySelector('button').addEventListener('click', () => switchView('add-task-view'));
+                    return;
+                }
+
+                // Sort tasks by due date and then priority (high first)
+                const sortedTasks = [...activeTasks].sort((a, b) => {
+                    const dateA = new Date(a.dueDate);
+                    const dateB = new Date(b.dueDate);
+                    if (dateA.getTime() !== dateB.getTime()) {
+                        return dateA - dateB;
+                    }
+                    const priorityOrder = { 'high': 3, 'medium': 2, 'low': 1 };
+                    return priorityOrder[b.priority] - priorityOrder[a.priority];
+                });
+
+                sortedTasks.forEach(task => {
+                    const listItem = document.createElement('li');
+                    listItem.classList.add('todo-item', task.priority, task.completed ? 'completed' : '');
+                    listItem.innerHTML = `
+                        <input type="checkbox" class="task-checkbox" data-id="${task.id}" ${task.completed ? 'checked' : ''}>
+                        <div class="task-info">
+                            <p class="task-description">${task.description}</p>
+                            <p class="task-meta">Due: ${formatDate(task.dueDate)} | Priority: ${task.priority} ${task.recurrence !== 'none' ? `| Repeats: ${task.recurrence}` : ''}</p>
+                            ${task.subtasks && task.subtasks.length > 0 ? `
+                                <ul class="subtasks-list">
+                                    ${task.subtasks.map((sub, idx) => `
+                                        <li>
+                                            <input type="checkbox" class="subtask-checkbox" data-task-id="${task.id}" data-subtask-idx="${idx}" ${sub.completed ? 'checked' : ''}>
+                                            <span class="${sub.completed ? 'completed-subtask' : ''}">${sub.description}</span>
+                                        </li>
+                                    `).join('')}
+                                </ul>
+                            ` : ''}
+                        </div>
+                        <div class="task-actions">
+                            <button class="edit-btn" data-id="${task.id}"><i class="fas fa-edit"></i></button>
+                            <button class="delete-btn" data-id="${task.id}"><i class="fas fa-trash"></i></button>
+                        </div>
+                    `;
+                    todoListUl.appendChild(listItem);
+                });
+
+                todoListUl.querySelectorAll('.task-checkbox').forEach(checkbox => {
+                    checkbox.addEventListener('change', (e) => toggleTaskCompletion(e.target.dataset.id));
+                });
+                todoListUl.querySelectorAll('.subtask-checkbox').forEach(checkbox => {
+                    checkbox.addEventListener('change', (e) => toggleSubtaskCompletion(e.target.dataset.taskId, e.target.dataset.subtaskIdx));
+                });
+                todoListUl.querySelectorAll('.edit-btn').forEach(button => {
+                    button.addEventListener('click', (e) => editTask(e.currentTarget.dataset.id));
+                });
+                todoListUl.querySelectorAll('.delete-btn').forEach(button => {
+                    button.addEventListener('click', (e) => deleteTask(e.currentTarget.dataset.id));
+                });
+            }
+
+            function toggleTaskCompletion(id) {
+                const task = tasks.find(t => t.id === id);
+                if (task) {
+                    task.completed = !task.completed;
+                    // If a task is marked complete, all subtasks are also complete
+                    if (task.completed && task.subtasks) {
+                        task.subtasks.forEach(sub => sub.completed = true);
+                    }
+                    saveData();
+                    displayTasks(); // Re-render to update UI
+                }
+            }
+
+            function toggleSubtaskCompletion(taskId, subtaskIdx) {
+                const task = tasks.find(t => t.id === taskId);
+                if (task && task.subtasks && task.subtasks[subtaskIdx]) {
+                    task.subtasks[subtaskIdx].completed = !task.subtasks[subtaskIdx].completed;
+                    // If all subtasks are complete, mark parent task complete
+                    if (task.subtasks.every(sub => sub.completed)) {
+                        task.completed = true;
+                    } else {
+                        task.completed = false; // If any subtask is incomplete, parent is incomplete
+                    }
+                    saveData();
+                    displayTasks(); // Re-render
+                }
+            }
+
+            function addSubtaskInput(description = '', completed = false) {
+                const subtaskDiv = document.createElement('div');
+                subtaskDiv.classList.add('subtask-input-group');
+                subtaskDiv.innerHTML = `
+                    <input type="text" value="${description}" placeholder="Subtask description">
+                    <button type="button" class="remove-subtask-btn secondary-btn small-btn">
+                        <i class="fas fa-times"></i>
+                    </button>
+                `;
+                subtasksContainer.appendChild(subtaskDiv);
+
+                subtaskDiv.querySelector('.remove-subtask-btn').addEventListener('click', () => {
+                    subtaskDiv.remove();
+                });
+            }
+
+            addSubtaskBtn.addEventListener('click', () => addSubtaskInput());
+
+            function resetTaskForm() {
+                taskIdInput.value = '';
+                taskDescriptionInput.value = '';
+                taskDueDateInput.valueAsDate = new Date();
+                taskPrioritySelect.value = 'medium';
+                taskRecurrenceSelect.value = 'none';
+                subtasksContainer.innerHTML = ''; // Clear subtasks
+                saveTaskBtn.textContent = 'Add Task';
+            }
+
+            taskForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                addOrUpdateTask();
+            });
+
+            function addOrUpdateTask() {
+                const id = taskIdInput.value || generateId();
+                const description = taskDescriptionInput.value.trim();
+                const dueDate = taskDueDateInput.value;
+                const priority = taskPrioritySelect.value;
+                const recurrence = taskRecurrenceSelect.value;
+
+                if (!description || !dueDate) {
+                    alert('Please fill in all task fields: Description and Due Date.');
+                    return;
+                }
+
+                const subtasks = Array.from(subtasksContainer.querySelectorAll('.subtask-input-group input[type="text"]'))
+                                     .filter(input => input.value.trim() !== '')
+                                     .map(input => ({ description: input.value.trim(), completed: false }));
+
+                const newTask = { id, description, dueDate, priority, recurrence, subtasks, completed: false };
+
+                const existingIndex = tasks.findIndex(t => t.id === id);
+                if (existingIndex > -1) {
+                    tasks[existingIndex] = newTask; // Update existing
+                } else {
+                    tasks.push(newTask); // Add new
+                }
+
+                saveData();
+                displayTasks();
+                resetTaskForm();
+                switchView('dashboard-view');
+                alert('Task saved successfully!');
+            }
+
+            function editTask(id) {
+                const task = tasks.find(t => t.id === id);
+                if (!task) return;
+
+                taskIdInput.value = task.id;
+                taskDescriptionInput.value = task.description;
+                taskDueDateInput.value = task.dueDate;
+                taskPrioritySelect.value = task.priority;
+                taskRecurrenceSelect.value = task.recurrence || 'none';
+
+                subtasksContainer.innerHTML = ''; // Clear existing subtask inputs
+                if (task.subtasks) {
+                    task.subtasks.forEach(sub => addSubtaskInput(sub.description, sub.completed));
+                }
+
+                saveTaskBtn.textContent = 'Update Task';
+                switchView('add-task-view');
+            }
+
+            function deleteTask(id) {
+                if (confirm('Are you sure you want to delete this task?')) {
+                    tasks = tasks.filter(t => t.id !== id);
+                    saveData();
+                    displayTasks();
+                    alert('Task deleted.');
+                }
+            }
+
+            // --- Dashboard: Pomodoro Timer Functionality ---
+            let pomodoroTimer;
+            let pomodoroRemainingTime = 0; // in seconds
+            let pomodoroIsRunning = false;
+            let currentPomodoroPhase = 'work'; // 'work', 'shortBreak', 'longBreak'
+            let pomodoroSessionCount = 0;
+
+            function savePomodoroConfig() {
+                localStorage.setItem('pomodoroConfig', JSON.stringify(pomodoroConfig));
+            }
+
+            function loadPomodoroConfig() {
+                workDurationInput.value = pomodoroConfig.work;
+                shortBreakDurationInput.value = pomodoroConfig.shortBreak;
+                longBreakDurationInput.value = pomodoroConfig.longBreak;
+                completedSessionsCountSpan.textContent = pomodoroConfig.completedSessions;
+                pomodoroSessionCount = pomodoroConfig.completedSessions;
+                setInitialTimerDisplay();
+            }
+
+            function setInitialTimerDisplay() {
+                const mins = pomodoroConfig.work;
+                const secs = 0;
+                pomodoroTimerDisplay.textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+            }
+
+            function updatePomodoroDisplay() {
+                const minutes = Math.floor(pomodoroRemainingTime / 60);
+                const seconds = pomodoroRemainingTime % 60;
+                pomodoroTimerDisplay.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            }
+
+            function startPomodoroTimer() {
+                if (pomodoroIsRunning) {
+                    clearInterval(pomodoroTimer);
+                    pomodoroIsRunning = false;
+                    pomodoroStartBtn.textContent = 'Start';
+                    pomodoroSection.classList.remove('pulsing');
+                    return;
+                }
+
+                pomodoroIsRunning = true;
+                pomodoroStartBtn.textContent = 'Pause';
+                pomodoroSection.classList.remove('pulsing'); // Ensure removed before new phase
+
+                if (pomodoroRemainingTime === 0) { // New session or phase
+                    if (currentPomodoroPhase === 'work') {
+                        pomodoroRemainingTime = pomodoroConfig.work * 60;
+                    } else if (currentPomodoroPhase === 'shortBreak') {
+                        pomodoroRemainingTime = pomodoroConfig.shortBreak * 60;
+                    } else if (currentPomodoroPhase === 'longBreak') {
+                        pomodoroRemainingTime = pomodoroConfig.longBreak * 60;
+                    }
+                }
+
+                pomodoroTimer = setInterval(() => {
+                    if (pomodoroRemainingTime <= 0) {
+                        clearInterval(pomodoroTimer);
+                        pomodoroIsRunning = false;
+                        pomodoroAlertSound.play();
+                        pomodoroSection.classList.add('pulsing'); // Visual alert
+
+                        showNotification(
+                            `${currentPomodoroPhase === 'work' ? 'Work' : 'Break'} Session Over!`,
+                            `${currentPomodoroPhase === 'work' ? 'Time for a break!' : 'Time to get back to work!'}`
+                        );
+
+                        if (currentPomodoroPhase === 'work') {
+                            pomodoroSessionCount++;
+                            pomodoroConfig.completedSessions = pomodoroSessionCount;
+                            completedSessionsCountSpan.textContent = pomodoroSessionCount;
+                            savePomodoroConfig();
+
+                            if (pomodoroSessionCount % 4 === 0) { // Every 4 work sessions, do a long break
+                                currentPomodoroPhase = 'longBreak';
+                                alert('Long break time! You earned it.');
+                            } else {
+                                currentPomodoroPhase = 'shortBreak';
+                                alert('Short break time!');
+                            }
+                        } else { // It was a break, go back to work
+                            currentPomodoroPhase = 'work';
+                            alert('Back to work!');
+                        }
+                        pomodoroStartBtn.textContent = 'Start';
+                        startPomodoroTimer(); // Automatically start next phase
+                    } else {
+                        pomodoroRemainingTime--;
+                    }
+                    updatePomodoroDisplay();
+                }, 1000);
+            }
+
+            function resetPomodoroTimer() {
+                clearInterval(pomodoroTimer);
+                pomodoroIsRunning = false;
+                pomodoroRemainingTime = 0;
+                currentPomodoroPhase = 'work'; // Always reset to work phase
+                setInitialTimerDisplay();
+                pomodoroStartBtn.textContent = 'Start';
+                pomodoroSection.classList.remove('pulsing');
+            }
+
+            pomodoroStartBtn.addEventListener('click', startPomodoroTimer);
+            pomodoroResetBtn.addEventListener('click', resetPomodoroTimer);
+
+            // Update config when duration inputs change
+            workDurationInput.addEventListener('change', () => {
+                pomodoroConfig.work = parseInt(workDurationInput.value) || 25;
+                savePomodoroConfig();
+                if (!pomodoroIsRunning && currentPomodoroPhase === 'work') setInitialTimerDisplay();
+            });
+            shortBreakDurationInput.addEventListener('change', () => {
+                pomodoroConfig.shortBreak = parseInt(shortBreakDurationInput.value) || 5;
+                savePomodoroConfig();
+            });
+            longBreakDurationInput.addEventListener('change', () => {
+                pomodoroConfig.longBreak = parseInt(longBreakDurationInput.value) || 15;
+                savePomodoroConfig();
+            });
+
+
+            // --- Notes: Subject Management ---
+            function populateSubjectSelects() {
+                const subjectSelects = [pdfSubjectSelect, textNoteSubjectSelect];
+                subjectSelects.forEach(select => {
+                    const selectedValue = select.value;
+                    select.innerHTML = '<option value="">Select a subject</option>';
+                    subjects.forEach(subject => {
+                        const option = document.createElement('option');
+                        option.value = subject;
+                        option.textContent = subject;
+                        select.appendChild(option);
+                    });
+                    if (selectedValue && select.querySelector(`option[value="${selectedValue}"]`)) {
+                        select.value = selectedValue;
+                    }
+                });
+            }
+
+            function displaySubjectsList() {
+                subjectListUl.innerHTML = '';
+                if (subjects.length === 0) {
+                    const li = document.createElement('li');
+                    li.classList.add('no-items');
+                    li.innerHTML = `<p>No subjects yet. Organize your notes!</p>
+                                    <button class="primary-btn small-btn" id="add-first-subject-btn">Add First Subject</button>`;
+                    subjectListUl.appendChild(li);
+                    li.querySelector('button').addEventListener('click', addSubject);
+                    return;
+                }
+
+                subjects.forEach(subject => {
+                    const listItem = document.createElement('li');
+                    listItem.classList.add('category-item');
+                    listItem.innerHTML = `
+                        <span>${subject}</span>
+                        <div class="action-buttons">
+                            <button class="delete-category-btn" data-subject="${subject}"><i class="fas fa-trash"></i></button>
+                        </div>
+                    `;
+                    subjectListUl.appendChild(listItem);
+                });
+
+                subjectListUl.querySelectorAll('.delete-category-btn').forEach(button => {
+                    button.addEventListener('click', (e) => deleteSubject(e.currentTarget.dataset.subject));
+                });
+            }
+
+            addNewSubjectBtn.addEventListener('click', addSubject);
+
+            function addSubject() {
+                const newSubjectName = newSubjectInput.value.trim();
+                if (newSubjectName && !subjects.includes(newSubjectName)) {
+                    subjects.push(newSubjectName);
+                    saveData();
+                    newSubjectInput.value = '';
+                    displaySubjectsList();
+                    populateSubjectSelects();
+                    alert('Subject added!');
+                } else if (subjects.includes(newSubjectName)) {
+                    alert('Subject already exists.');
+                }
+            }
+
+            function deleteSubject(subjectName) {
+                 const notesWithSubject = uploadedNotes.filter(n => n.subject === subjectName);
+                 const textNotesWithSubject = textNotes.filter(n => n.subject === subjectName);
+                if (notesWithSubject.length > 0 || textNotesWithSubject.length > 0) {
+                    alert(`Cannot delete subject "${subjectName}" because notes are associated with it. Please delete or reassign those notes first.`);
+                    return;
+                }
+                if (confirm(`Are you sure you want to delete the subject "${subjectName}"?`)) {
+                    subjects = subjects.filter(s => s !== subjectName);
+                    saveData();
+                    displaySubjectsList();
+                    populateSubjectSelects();
+                    alert('Subject deleted.');
+                }
+            }
+
+            // --- Notes: Text Note Management ---
+            function displayNotesList(listElement, notesArray, itemType, deleteCallback, editCallback) {
+                listElement.innerHTML = '';
+                if (notesArray.length === 0) {
+                    const li = document.createElement('li');
+                    li.classList.add('no-items');
+                    li.innerHTML = `<p>No ${itemType} yet. ${itemType === 'text notes' ? 'Jot down some thoughts!' : 'Keep your study materials organized!'}</p>
+                                    <button class="primary-btn small-btn" id="add-first-${itemType.replace(/\s/g, '-')}-btn">Add First ${itemType.charAt(0).toUpperCase() + itemType.slice(1).split(' ')[0]}</button>`; // Dynamic button text
+                    listElement.appendChild(li);
+                    li.querySelector('button').addEventListener('click', () => {
+                         if (itemType === 'text notes') resetTextNoteForm();
+                         if (itemType === 'uploaded PDFs') pdfUploadInput.click();
+                    });
+                    return;
+                }
+
+                notesArray.forEach(item => {
+                    const listItem = document.createElement('li');
+                    listItem.classList.add('transaction-item', itemType === 'uploaded PDFs' ? 'income' : 'expense'); // Reusing styling
+                    listItem.innerHTML = `
+                        <div class="transaction-icon"><i class="fas ${itemType === 'uploaded PDFs' ? 'fa-file-pdf' : 'fa-sticky-note'}"></i></div>
+                        <div class="transaction-info">
+                            <p class="transaction-description">${item.name || item.title}</p>
+                            <p class="transaction-date">Created: ${formatDate(item.uploadDate || item.createdDate)}</p>
+                            <p class="transaction-category">${item.subject}</p>
+                        </div>
+                        <div class="transaction-actions">
+                            ${itemType === 'uploaded PDFs' ? `<button class="view-pdf-btn" data-id="${item.id}" title="View PDF (simulated)"><i class="fas fa-eye"></i></button>` : `<button class="edit-btn" data-id="${item.id}" title="Edit Note"><i class="fas fa-edit"></i></button>`}
+                            <button class="delete-btn" data-id="${item.id}" title="Delete ${itemType.split(' ')[0]}"><i class="fas fa-trash"></i></button>
+                        </div>
+                    `;
+                    listElement.appendChild(listItem);
+                });
+
+                listElement.querySelectorAll('.delete-btn').forEach(button => {
+                    button.addEventListener('click', (e) => deleteCallback(e.currentTarget.dataset.id));
+                });
+                if (editCallback) {
+                    listElement.querySelectorAll('.edit-btn').forEach(button => {
+                        button.addEventListener('click', (e) => editCallback(e.currentTarget.dataset.id));
+                    });
+                }
+                listElement.querySelectorAll('.view-pdf-btn').forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        const note = uploadedNotes.find(n => n.id === e.currentTarget.dataset.id);
+                        if (note) {
+                            alert(`Simulating PDF view for: ${note.name}\n(In a real app, this would open the PDF in a new tab or viewer)`);
+                            // window.open(note.filePath, '_blank'); // Would try to open if actual path existed
+                        }
+                    });
+                });
+            }
+
+            function displayTextNotes() {
+                displayNotesList(textNotesListUl, textNotes, 'text notes', deleteTextNote, editTextNote);
+            }
+
+            textNoteForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                addOrUpdateTextNote();
+            });
+
+            clearTextNoteBtn.addEventListener('click', resetTextNoteForm);
+
+            function resetTextNoteForm() {
+                textNoteIdInput.value = '';
+                textNoteTitleInput.value = '';
+                textNoteSubjectSelect.value = '';
+                textNoteContentInput.value = '';
+                saveTextNoteBtn.textContent = 'Save Note';
+            }
+
+            function addOrUpdateTextNote() {
+                const id = textNoteIdInput.value || generateId();
+                const title = textNoteTitleInput.value.trim();
+                const subject = textNoteSubjectSelect.value;
+                const content = textNoteContentInput.value.trim();
+
+                if (!title || !subject || !content) {
+                    alert('Please fill in all text note fields.');
+                    return;
+                }
+
+                const newNote = { id, title, subject, content, createdDate: new Date().toISOString().split('T')[0] };
+
+                const existingIndex = textNotes.findIndex(n => n.id === id);
+                if (existingIndex > -1) {
+                    textNotes[existingIndex] = newNote;
+                } else {
+                    textNotes.push(newNote);
+                }
+
+                saveData();
+                displayTextNotes();
+                resetTextNoteForm();
+                alert('Text note saved successfully!');
+            }
+
+            function editTextNote(id) {
+                const note = textNotes.find(n => n.id === id);
+                if (!note) return;
+
+                textNoteIdInput.value = note.id;
+                textNoteTitleInput.value = note.title;
+                textNoteSubjectSelect.value = note.subject;
+                textNoteContentInput.value = note.content;
+                saveTextNoteBtn.textContent = 'Update Note';
+            }
+
+            function deleteTextNote(id) {
+                if (confirm('Are you sure you want to delete this text note?')) {
+                    textNotes = textNotes.filter(n => n.id !== id);
+                    saveData();
+                    displayTextNotes();
+                    alert('Text note deleted.');
+                }
+            }
+
+
+            // --- Notes: PDF Uploads (Metadata only) ---
+            uploadPdfBtn.addEventListener('click', () => {
+                const selectedSubject = pdfSubjectSelect.value;
+                const file = pdfUploadInput.files[0];
+
+                if (!selectedSubject) {
+                    alert('Please select a subject for your PDF note.');
+                    return;
+                }
+                if (!file) {
+                    alert('Please select a PDF file to upload.');
+                    return;
+                }
+                if (file.type !== 'application/pdf') {
+                    alert('Only PDF files are allowed.');
+                    return;
+                }
+
+                const newNote = {
+                    id: generateId(),
+                    name: file.name,
+                    subject: selectedSubject,
+                    uploadDate: new Date().toISOString().split('T')[0],
+                    filePath: `simulated_path/${file.name}` // Placeholder
+                };
+                uploadedNotes.push(newNote);
+                saveData();
+                displayUploadedNotes();
+                pdfUploadInput.value = ''; // Clear file input
+                alert(`PDF Note "${file.name}" uploaded to ${selectedSubject}! (File not actually stored)`);
+            });
+
+            function displayUploadedNotes() {
+                displayNotesList(uploadedNotesListUl, uploadedNotes, 'uploaded PDFs', deleteUploadedNote);
+            }
+
+            function deleteUploadedNote(id) {
+                if (confirm('Are you sure you want to delete this PDF note record? (This does not delete the actual file if stored externally)')) {
+                    uploadedNotes = uploadedNotes.filter(n => n.id !== id);
+                    saveData();
+                    displayUploadedNotes();
+                    alert('PDF note record deleted.');
+                }
+            }
+
+
+            // --- Timetable Functionality ---
+            let currentTimetableWeek = new Date(); // Represents the Monday of the current displayed week
+
+            function getMonday(d) {
+                d = new Date(d);
+                const day = d.getDay(),
+                    diff = d.getDate() - day + (day == 0 ? -6 : 1);
+                return new Date(d.setDate(diff));
+            }
+
+            function formatWeekDisplay(date) {
+                const monday = getMonday(date);
+                const sunday = new Date(monday);
+                sunday.setDate(monday.getDate() + 6);
+                const options = { month: 'short', day: 'numeric' };
+                return `Week of ${monday.toLocaleDateString(undefined, options)} - ${sunday.toLocaleDateString(undefined, options)}, ${sunday.getFullYear()}`;
+            }
+
+            function generateTimeSlots() {
+                const slots = [];
+                for (let h = 8; h <= 22; h++) { // From 8 AM to 10 PM (22:00)
+                    slots.push(`${String(h).padStart(2, '0')}:00`);
+                }
+                return slots;
+            }
+
+            function populateTimetableGrid() {
+                currentTimetableWeek = getMonday(currentTimetableWeek);
+                currentWeekDisplay.textContent = formatWeekDisplay(currentTimetableWeek);
+
+                timetableGrid.innerHTML = ''; // Clear existing content
+
+                const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+                const timeSlots = generateTimeSlots();
+
+                // Create grid headers
+                const timeHeader = document.createElement('div');
+                timeHeader.classList.add('grid-header');
+                timeHeader.textContent = 'Time';
+                timetableGrid.appendChild(timeHeader);
+
+                daysOfWeek.forEach(day => {
+                    const dayHeader = document.createElement('div');
+                    dayHeader.classList.add('grid-header');
+                    dayHeader.textContent = day.substring(0, 3); // Mon, Tue etc.
+                    timetableGrid.appendChild(dayHeader);
+                });
+
+                // Add time slots and empty schedule cells
+                timeSlots.forEach(time => {
+                    const timeSlotDiv = document.createElement('div');
+                    timeSlotDiv.classList.add('time-slot');
+                    timeSlotDiv.textContent = time;
+                    timetableGrid.appendChild(timeSlotDiv);
+
+                    daysOfWeek.forEach(day => {
+                        const emptyCell = document.createElement('div');
+                        emptyCell.classList.add('schedule-cell');
+                        emptyCell.dataset.day = day;
+                        emptyCell.dataset.time = time;
+                        timetableGrid.appendChild(emptyCell);
+                    });
+                });
+
+                // Populate schedule items for the current week
+                scheduleItems.forEach(item => {
+                    const itemDate = new Date(item.date); // Assuming schedule items have a date now for weekly display
+                    // For simplicity, we'll display all schedule items in the timetable for now,
+                    // as actual weekly filtering would involve checking item.date against currentTimetableWeek
+                    // For now, only check day and time.
+                    const cell = timetableGrid.querySelector(`.schedule-cell[data-day="${item.dayOfWeek}"][data-time="${item.startTime}"]`);
+                    if (cell) {
+                        cell.innerHTML = `
+                            <div class="schedule-item-content" data-id="${item.id}" style="background-color: ${item.color};">
+                                <strong>${item.title}</strong>
+                                <br>${item.startTime}-${item.endTime}
+                            </div>
+                        `;
+                        cell.classList.add('has-item');
+                        cell.dataset.id = item.id;
+
+                        const contentDiv = cell.querySelector('.schedule-item-content');
+                        contentDiv.addEventListener('click', (e) => {
+                            // Prevent click on parent cell from triggering if clicking content
+                            if (e.target === contentDiv || e.target.closest('.schedule-item-content')) {
+                                editScheduleItem(item.id);
+                            }
+                        });
+                        contentDiv.addEventListener('contextmenu', (e) => {
+                            e.preventDefault();
+                            if (confirm(`Delete "${item.title}"?`)) {
+                                deleteScheduleItem(item.id);
+                            }
+                        });
+                    }
+                });
+            }
+
+
+            prevWeekBtn.addEventListener('click', () => {
+                currentTimetableWeek.setDate(currentTimetableWeek.getDate() - 7);
+                populateTimetableGrid();
+            });
+
+            nextWeekBtn.addEventListener('click', () => {
+                currentTimetableWeek.setDate(currentTimetableWeek.getDate() + 7);
+                populateTimetableGrid();
+            });
+
+            addScheduleItemBtn.addEventListener('click', () => switchView('add-schedule-item-view'));
+
+            function resetScheduleItemForm() {
+                scheduleItemIdInput.value = '';
+                scheduleTitleInput.value = '';
+                scheduleDaySelect.value = 'Monday';
+                scheduleStartTimeInput.value = '09:00';
+                scheduleEndTimeInput.value = '10:00';
+                scheduleColorInput.value = '#00BCD4'; // Default to new accent color
+                scheduleNotesInput.value = '';
+                saveScheduleItemBtn.textContent = 'Save Item';
+            }
+
+            scheduleItemForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                addOrUpdateScheduleItem();
+            });
+
+            function checkOverlap(newItem, existingItems) {
+                const newStartTime = newItem.startTime;
+                const newEndTime = newItem.endTime;
+                const newDay = newItem.dayOfWeek;
+
+                return existingItems.some(item => {
+                    // Skip checking against itself if it's an edit
+                    if (newItem.id && item.id === newItem.id) return false;
+
+                    // Only check items on the same day
+                    if (item.dayOfWeek !== newDay) return false;
+
+                    const existingStartTime = item.startTime;
+                    const existingEndTime = item.endTime;
+
+                    // Check for overlap: (startA < endB) && (endA > startB)
+                    const overlaps = (newStartTime < existingEndTime) && (newEndTime > existingStartTime);
+                    return overlaps;
+                });
+            }
+
+            function addOrUpdateScheduleItem() {
+                const id = scheduleItemIdInput.value || generateId();
+                const title = scheduleTitleInput.value.trim();
+                const dayOfWeek = scheduleDaySelect.value;
+                const startTime = scheduleStartTimeInput.value;
+                const endTime = scheduleEndTimeInput.value;
+                const color = scheduleColorInput.value;
+                const notes = scheduleNotesInput.value.trim();
+
+                if (!title || !dayOfWeek || !startTime || !endTime) {
+                    alert('Please fill in all required schedule item fields.');
+                    return;
+                }
+
+                if (startTime >= endTime) {
+                    alert('End time must be after start time.');
+                    return;
+                }
+
+                const newScheduleItem = { id, title, dayOfWeek, startTime, endTime, color, notes };
+
+                // Check for overlap before saving
+                if (checkOverlap(newScheduleItem, scheduleItems)) {
+                    alert('This schedule item overlaps with an existing one. Please adjust the times.');
+                    return;
+                }
+
+                const existingIndex = scheduleItems.findIndex(item => item.id === id);
+                if (existingIndex > -1) {
+                    scheduleItems[existingIndex] = newScheduleItem;
+                } else {
+                    scheduleItems.push(newScheduleItem);
+                }
+
+                saveData();
+                populateTimetableGrid();
+                resetScheduleItemForm();
+                switchView('timetable-view');
+                alert('Schedule item saved successfully!');
+            }
+
+            function editScheduleItem(id) {
+                const item = scheduleItems.find(item => item.id === id);
+                if (!item) return;
+
+                scheduleItemIdInput.value = item.id;
+                scheduleTitleInput.value = item.title;
+                scheduleDaySelect.value = item.dayOfWeek;
+                scheduleStartTimeInput.value = item.startTime;
+                scheduleEndTimeInput.value = item.endTime;
+                scheduleColorInput.value = item.color || '#00BCD4'; // Default if no color saved
+                scheduleNotesInput.value = item.notes;
+                saveScheduleItemBtn.textContent = 'Update Item';
+                switchView('add-schedule-item-view');
+            }
+
+            function deleteScheduleItem(id) {
+                if (confirm('Are you sure you want to delete this schedule item?')) {
+                    scheduleItems = scheduleItems.filter(item => item.id !== id);
+                    saveData();
+                    populateTimetableGrid();
+                    alert('Schedule item deleted.');
+                }
+            }
+
+
+            // --- Calculator Functionality ---
+            function calculate(first, second, operator) {
+                first = parseFloat(first);
+                second = parseFloat(second);
+                if (isNaN(first) || isNaN(second)) return NaN;
+
+                switch (operator) {
+                    case '+': return first + second;
+                    case '-': return first - second;
+                    case '*': return first * second;
+                    case '/': return second === 0 ? NaN : first / second;
+                    default: return NaN;
+                }
+            }
+
+            function updateDisplay() {
+                calcOutput.value = currentInput;
+            }
+
+            function resetCalculator() {
+                currentInput = '0';
+                firstOperand = null;
+                operator = null;
+                waitingForSecondOperand = false;
+                updateDisplay();
+            }
+
+            calcButtons.addEventListener('click', (event) => {
+                const { target } = event;
+                if (!target.matches('button')) return;
+
+                const action = target.dataset.action;
+
+                if (target.classList.contains('number')) {
+                    if (waitingForSecondOperand) {
+                        currentInput = target.textContent;
+                        waitingForSecondOperand = false;
+                    } else {
+                        currentInput = currentInput === '0' ? target.textContent : currentInput + target.textContent;
+                    }
+                } else if (target.classList.contains('decimal')) {
+                    if (!currentInput.includes('.')) {
+                        currentInput += '.';
+                    }
+                } else if (target.classList.contains('operator')) {
+                    const nextOperator = action;
+                    if (firstOperand === null) {
+                        firstOperand = parseFloat(currentInput);
+                    } else if (operator) {
+                        const result = calculate(firstOperand, parseFloat(currentInput), operator);
+                        currentInput = parseFloat(result.toFixed(5)).toString();
+                        firstOperand = parseFloat(currentInput);
+                    }
+                    waitingForSecondOperand = true;
+                    operator = nextOperator === 'add' ? '+' : nextOperator === 'subtract' ? '-' : nextOperator === 'multiply' ? '*' : '/';
+                } else if (action === 'equals') {
+                    if (firstOperand !== null && operator !== null) {
+                        const result = calculate(firstOperand, parseFloat(currentInput), operator);
+                        currentInput = parseFloat(result.toFixed(5)).toString();
+                        firstOperand = null;
+                        operator = null;
+                        waitingForSecondOperand = true;
+                    }
+                } else if (action === 'clear') {
+                    resetCalculator();
+                } else if (action === 'backspace') {
+                    currentInput = currentInput.slice(0, -1) || '0';
+                } else if (action === 'apply') {
+                    // Calculator result can't be directly applied to any existing form fields (no amount fields)
+                    alert("Calculator result cannot be applied directly to a form field in this app.");
+                    calculatorContainer.style.display = 'none';
+                    resetCalculator();
+                }
+                updateDisplay();
+            });
+
+            // --- Backup and Restore Functionality ---
+            backupDataBtn.addEventListener('click', () => {
+                const data = {
+                    tasks: tasks,
+                    subjects: subjects,
+                    uploadedNotes: uploadedNotes,
+                    textNotes: textNotes,
+                    scheduleItems: scheduleItems,
+                    pomodoroConfig: pomodoroConfig
+                };
+                const dataStr = JSON.stringify(data, null, 2);
+                const blob = new Blob([dataStr], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'study_planner_data.json';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                alert('Data backed up successfully as study_planner_data.json!');
+            });
+
+            restoreDataBtn.addEventListener('click', () => {
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = '.json';
+                input.onchange = e => {
+                    const file = e.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = function(event) {
+                            try {
+                                const loadedData = JSON.parse(event.target.result);
+                                if (confirm('Restoring data will overwrite your current data. Are you sure?')) {
+                                    tasks = loadedData.tasks || [];
+                                    subjects = loadedData.subjects || ['Mathematics', 'Physics', 'Chemistry', 'Biology'];
+                                    uploadedNotes = loadedData.uploadedNotes || [];
+                                    textNotes = loadedData.textNotes || [];
+                                    scheduleItems = loadedData.scheduleItems || [];
+                                    pomodoroConfig = loadedData.pomodoroConfig || {work: 25, shortBreak: 5, longBreak: 15, completedSessions: 0};
+                                    saveData();
+                                    initializeApp(); // Reinitialize UI with new data
+                                    alert('Data restored successfully!');
+                                    switchView('dashboard-view');
+                                }
+                            } catch (error) {
+                                alert('Failed to restore data. Please ensure the file is a valid JSON export.');
+                                console.error('Error restoring data:', error);
+                            }
+                        };
+                        reader.readAsText(file);
+                    }
+                };
+                input.click();
+            });
+
+
+            // --- Event Listeners ---
+            themeToggleBtn.addEventListener('click', () => {
+                const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+                applyTheme(newTheme);
+            });
+
+            calculatorToggleBtn.addEventListener('click', () => {
+                calculatorContainer.style.display = calculatorContainer.style.display === 'none' ? 'flex' : 'none';
+                if (calculatorContainer.style.display === 'none') {
+                    resetCalculator();
+                }
+            });
+
+            navItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    switchView(item.dataset.view);
+                });
+            });
+
+            backToDashboardBtns.forEach(btn => {
+                btn.addEventListener('click', () => switchView('dashboard-view'));
+            });
+
+            if (backToTimetableBtn) { // Check if element exists before adding listener
+                backToTimetableBtn.addEventListener('click', () => switchView('timetable-view'));
+            }
+
+
+            // --- Initialize on Load ---
+            initializeApp();
+        });
+    </script>
+</body>
+</html>
