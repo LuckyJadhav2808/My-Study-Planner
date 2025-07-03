@@ -24,67 +24,50 @@
     --heading-color-dark: #F5F5F5;
     --accent-color-dark: #26C6DA; /* Slightly brighter Cyan for dark theme contrast */
     --expense-color-dark: #FF6673;
-    --income-color-dark: #3AD75C;
-    --border-color-dark: #4A4A4A;
+    --income-color-dark: #4CAF50;
+    --border-color-dark: #444444;
     --shadow-color-dark: rgba(0, 0, 0, 0.3);
-
-    /* Current Theme Variables (JavaScript will switch these) */
-    --bg-color: var(--bg-color-light);
-    --card-bg: var(--card-bg-light);
-    --text-color: var(--text-color-light);
-    --heading-color: var(--heading-color-light);
-    --accent-color: var(--accent-color-light);
-    --expense-color: var(--expense-color-light);
-    --income-color: var(--income-color-light);
-    --border-color: var(--border-color-light);
-    --shadow-color: var(--shadow-color-light);
-
-    /* Additional color for accent-color-rgb for box-shadows */
-    --accent-color-rgb: 0, 188, 212; /* For RGBA shadows */
 
     /* Fonts */
     --font-body: 'Inter', sans-serif;
     --font-heading: 'Roboto', sans-serif;
 }
 
-/* Dark Theme specific overrides */
-.dark-theme {
-    --bg-color: var(--bg-color-dark);
-    --card-bg: var(--card-bg-dark);
-    --text-color: var(--text-color-dark);
-    --heading-color: var(--heading-color-dark);
-    --accent-color: var(--accent-color-dark);
-    --expense-color: var(--expense-color-dark);
-    --income-color: var(--income-color-dark);
-    --border-color: var(--border-color-dark);
-    --shadow-color: var(--shadow-color-dark);
-    --accent-color-rgb: 38, 198, 218; /* Corresponding RGB for dark accent */
-}
-
-
 body {
     font-family: var(--font-body);
-    line-height: 1.6;
-    color: var(--text-color);
-    background-color: var(--bg-color);
+    background-color: var(--bg-color-light);
+    color: var(--text-color-light);
+    transition: background-color 0.3s ease, color 0.3s ease;
     display: flex;
     justify-content: center;
-    align-items: flex-start; /* Align to top for longer content */
+    align-items: center;
     min-height: 100vh;
-    transition: background-color 0.3s ease, color 0.3s ease;
+    padding: 1rem;
+}
+
+.dark-theme {
+    background-color: var(--bg-color-dark);
+    color: var(--text-color-dark);
 }
 
 .app-container {
+    background-color: var(--bg-color-light); /* Base for app, but main-content overrides */
     width: 100%;
-    max-width: 450px; /* Typical phone width */
-    min-height: 100vh;
-    background-color: var(--card-bg);
-    box-shadow: 0 4px 20px var(--shadow-color);
-    border-radius: 15px;
-    overflow: hidden; /* Ensures rounded corners are visible */
+    max-width: 450px; /* Typical mobile width */
+    height: 90vh; /* Make it responsive for a mobile screen */
     display: flex;
     flex-direction: column;
-    position: relative; /* For sticky footer/nav */
+    border-radius: 12px;
+    box-shadow: 0 4px 20px var(--shadow-color-light);
+    overflow: hidden; /* For internal scrolling sections */
+    position: relative;
+    border: 1px solid var(--border-color-light);
+}
+
+.dark-theme .app-container {
+    background-color: var(--bg-color-dark);
+    box-shadow: 0 4px 20px var(--shadow-color-dark);
+    border: 1px solid var(--border-color-dark);
 }
 
 /* Header */
@@ -93,872 +76,745 @@ body {
     justify-content: space-between;
     align-items: center;
     padding: 1rem;
-    background-color: var(--card-bg);
-    border-bottom: 1px solid var(--border-color);
-    color: var(--heading-color);
-    position: sticky;
-    top: 0;
+    background-color: var(--card-bg-light);
+    border-bottom: 1px solid var(--border-color-light);
+    color: var(--heading-color-light);
+    box-shadow: 0 2px 4px var(--shadow-color-light);
     z-index: 10;
+}
+
+.dark-theme .app-header {
+    background-color: var(--card-bg-dark);
+    border-bottom: 1px solid var(--border-color-dark);
+    color: var(--heading-color-dark);
+    box-shadow: 0 2px 4px var(--shadow-color-dark);
 }
 
 .app-title {
     font-family: var(--font-heading);
     font-size: 1.5rem;
     font-weight: 700;
-    color: var(--accent-color); /* Make title pop with accent */
 }
 
-.toggle-theme-btn, .toggle-calculator-btn { /* Combined styles */
-    font-size: 1.4rem;
+.header-left .toggle-theme-btn,
+.header-right .toggle-calculator-btn {
+    font-size: 1.2rem;
     cursor: pointer;
-    color: var(--text-color);
+    color: var(--accent-color-light);
     padding: 0.5rem;
     border-radius: 50%;
     transition: background-color 0.2s ease;
 }
 
-.toggle-theme-btn:hover, .toggle-calculator-btn:hover {
-    background-color: rgba(0, 0, 0, 0.05);
+.dark-theme .header-left .toggle-theme-btn,
+.dark-theme .header-right .toggle-calculator-btn {
+    color: var(--accent-color-dark);
 }
 
-.dark-theme .toggle-theme-btn:hover, .dark-theme .toggle-calculator-btn:hover {
-     background-color: rgba(255, 255, 255, 0.1);
+.header-left .toggle-theme-btn:hover,
+.header-right .toggle-calculator-btn:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+.dark-theme .header-left .toggle-theme-btn:hover,
+.dark-theme .header-right .toggle-calculator-btn:hover {
+    background-color: rgba(255, 255, 255, 0.1);
 }
 
 /* Main Content Area */
 .main-content {
-    flex-grow: 1; /* Takes up available space */
+    flex-grow: 1;
+    overflow-y: auto; /* Enable scrolling for content within sections */
     padding: 1rem;
-    overflow-y: auto; /* Enable scrolling for content if it overflows */
-    padding-bottom: 70px; /* Space for the fixed bottom nav */
+    background-color: var(--bg-color-light);
+    position: relative; /* For absolute positioning of views */
+}
+
+.dark-theme .main-content {
+    background-color: var(--bg-color-dark);
 }
 
 .view {
-    display: none; /* Hide all views by default */
-    padding-top: 1rem; /* Adjust padding for views */
+    display: none;
+    padding-bottom: 50px; /* Space for bottom nav */
 }
 
 .view.active {
-    display: block; /* Show active view */
+    display: block;
 }
 
-.section-title, .subsection-title { /* Added subsection-title */
+h2 {
     font-family: var(--font-heading);
     font-size: 1.3rem;
-    font-weight: 700;
-    color: var(--heading-color);
+    color: var(--heading-color-light);
     margin-bottom: 1rem;
-    text-align: center;
-}
-.subsection-title {
-    font-size: 1.1rem;
-    margin-top: 1.5rem;
-    margin-bottom: 0.75rem;
-    text-align: left;
-    border-bottom: 1px solid var(--border-color);
+    border-bottom: 2px solid var(--accent-color-light);
     padding-bottom: 0.5rem;
-}
-
-/* Dashboard Specific Styles */
-.dashboard-card {
-    background-color: var(--card-bg);
-    padding: 1.5rem;
-    border-radius: 12px;
-    margin-bottom: 1.5rem;
-    box-shadow: 0 4px 10px var(--shadow-color);
-}
-
-.dashboard-card .subsection-title {
-    text-align: center;
-    border-bottom: none;
-    margin-top: 0;
-    margin-bottom: 1rem;
-    padding-bottom: 0;
-}
-
-/* To-Do List Styles */
-.todo-list {
-    list-style: none;
-    padding: 0;
-    margin-bottom: 1rem;
-}
-
-.todo-item {
-    display: flex;
-    align-items: flex-start; /* Align to top for subtasks */
-    background-color: var(--bg-color); /* Lighter background for items within card */
-    padding: 0.8rem 1rem;
-    margin-bottom: 0.5rem;
-    border-radius: 8px;
-    box-shadow: 0 1px 3px var(--shadow-color);
-    border-left: 5px solid transparent;
-}
-.dark-theme .todo-item {
-    background-color: #4A4A4A;
-}
-
-
-.todo-item input[type="checkbox"] {
-    margin-right: 0.75rem;
-    margin-top: 0.2rem; /* Adjust alignment */
-    width: 1.2rem;
-    height: 1.2rem;
-    accent-color: var(--income-color); /* Green checkbox */
-    flex-shrink: 0;
-}
-
-.todo-item .task-info {
-    flex-grow: 1;
-}
-
-.todo-item .task-description {
-    font-weight: 600;
-    color: var(--heading-color);
-    margin-bottom: 0.2rem;
-}
-
-.todo-item .task-meta {
-    font-size: 0.8rem;
-    color: var(--text-color);
-    opacity: 0.7;
-}
-
-/* Subtasks */
-.subtasks-list {
-    list-style: none;
-    padding: 0;
-    margin-top: 0.5rem;
-    margin-left: -0.2rem; /* Align with parent task description */
-    border-top: 1px dashed var(--border-color);
-    padding-top: 0.5rem;
-}
-.subtasks-list li {
-    display: flex;
-    align-items: center;
-    font-size: 0.9rem;
-    color: var(--text-color);
-    margin-bottom: 0.3rem;
-}
-.subtasks-list li input[type="checkbox"] {
-    margin-right: 0.5rem;
-    width: 1rem;
-    height: 1rem;
-    flex-shrink: 0;
-}
-.subtasks-list li .completed-subtask {
-    text-decoration: line-through;
-    opacity: 0.7;
-}
-
-/* Priority styling */
-.todo-item.high { border-left-color: var(--expense-color); } /* Red */
-.todo-item.medium { border-left-color: var(--accent-color); } /* Cyan */
-.todo-item.low { border-left-color: var(--income-color); } /* Green */
-
-/* Completed task styling */
-.todo-item.completed {
-    opacity: 0.7;
-    text-decoration: line-through;
-    background-color: var(--border-color); /* Faded background */
-}
-.dark-theme .todo-item.completed {
-    background-color: #555555;
-}
-
-.task-actions {
-    display: flex;
-    gap: 0.5rem;
-    margin-left: 0.5rem;
-    flex-shrink: 0;
-}
-.task-actions button {
-    background: none;
-    border: none;
-    color: var(--text-color);
-    font-size: 1rem;
-    cursor: pointer;
-    opacity: 0.7;
-    transition: opacity 0.2s ease, color 0.2s ease;
-}
-.task-actions button:hover {
-    opacity: 1;
-    color: var(--accent-color);
-}
-.task-actions .delete-btn:hover {
-    color: var(--expense-color);
-}
-
-/* Pomodoro Timer Styles */
-.pomodoro-card {
-    text-align: center;
-}
-.timer-display {
-    font-family: var(--font-heading);
-    font-size: 3.5rem;
-    font-weight: 700;
-    color: var(--accent-color);
-    margin-bottom: 1.5rem;
-    text-shadow: 0 2px 5px rgba(0,0,0,0.1);
-}
-.timer-controls {
-    display: flex;
-    justify-content: center;
-    gap: 1rem;
-}
-.timer-controls .primary-btn,
-.timer-controls .secondary-btn {
-    width: auto;
-    flex: 1;
-    max-width: 120px;
-    margin-top: 0;
-}
-.pomodoro-config {
-    display: grid;
-    grid-template-columns: auto 1fr;
-    align-items: center;
-    gap: 0.5rem 1rem;
-    margin-top: 1.5rem;
-    max-width: 250px;
-    margin-left: auto;
-    margin-right: auto;
-}
-.pomodoro-config label {
-    font-weight: 600;
-    color: var(--heading-color);
-    text-align: right;
-}
-.pomodoro-config input[type="number"] {
-    width: 100%;
-    padding: 0.4rem 0.8rem;
-    border: 1px solid var(--border-color);
-    border-radius: 6px;
-    background-color: var(--bg-color);
-    color: var(--text-color);
-    font-size: 0.95rem;
-}
-.pomodoro-sessions {
     margin-top: 1rem;
-    font-size: 1rem;
-    color: var(--text-color);
-    font-weight: 600;
 }
-.pomodoro-sessions span {
-    color: var(--accent-color);
+h2:first-of-type {
+    margin-top: 0;
+}
+
+.dark-theme h2 {
+    color: var(--heading-color-dark);
+    border-bottom-color: var(--accent-color-dark);
+}
+
+.section-card {
+    background-color: var(--card-bg-light);
+    border: 1px solid var(--border-color-light);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 1px 5px var(--shadow-color-light);
+}
+
+.dark-theme .section-card {
+    background-color: var(--card-bg-dark);
+    border-color: var(--border-color-dark);
+    box-shadow: 0 1px 5px var(--shadow-color-dark);
+}
+
+.section-card h3 {
     font-family: var(--font-heading);
     font-size: 1.1rem;
+    color: var(--accent-color-light);
+    margin-bottom: 0.8rem;
 }
-
-/* Pulsing animation for Pomodoro alert */
-@keyframes pulse {
-    0% { box-shadow: 0 0 0 0 rgba(var(--accent-color-rgb), 0.7); }
-    70% { box-shadow: 0 0 0 15px rgba(var(--accent-color-rgb), 0); }
-    100% { box-shadow: 0 0 0 0 rgba(var(--accent-color-rgb), 0); }
-}
-
-.pomodoro-card.pulsing {
-    animation: pulse 1s infinite;
+.dark-theme .section-card h3 {
+    color: var(--accent-color-dark);
 }
 
 
-/* Form Styles (reused for Add Task, Add Schedule Item, Text Notes) */
-.task-form .form-group,
-.notes-section .form-group,
-.notes-form .form-group { /* Added notes-form */
-    margin-bottom: 1rem;
+/* Form Elements */
+.form-group {
+    margin-bottom: 0.8rem;
 }
 
-.task-form label,
-.notes-section label,
-.notes-form label {
+.form-group label {
     display: block;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.3rem;
     font-weight: 600;
-    color: var(--heading-color);
+    color: var(--heading-color-light);
+}
+.dark-theme .form-group label {
+    color: var(--heading-color-dark);
 }
 
-.task-form input[type="text"],
-.task-form input[type="number"],
-.task-form input[type="date"],
-.task-form select,
-.new-category-input,
-.task-form textarea,
-.notes-section input[type="text"],
-.notes-section input[type="file"],
-.notes-section select,
-.notes-section textarea,
-.expense-form input[type="time"],
-.expense-form input[type="color"], /* For color picker */
-.notes-form input[type="text"],
-.notes-form textarea,
-.notes-form select { /* Added for new text note form */
+input[type="text"],
+input[type="number"],
+input[type="date"],
+input[type="time"],
+select,
+textarea {
     width: 100%;
-    padding: 0.8rem 1rem;
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
+    padding: 0.6rem;
+    border: 1px solid var(--border-color-light);
+    border-radius: 5px;
+    background-color: var(--card-bg-light);
+    color: var(--text-color-light);
     font-family: var(--font-body);
     font-size: 1rem;
-    background-color: var(--card-bg);
-    color: var(--text-color);
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
-.task-form textarea,
-.expense-form textarea,
-.notes-form textarea {
-    resize: vertical;
-    min-height: 60px;
+
+.dark-theme input[type="text"],
+.dark-theme input[type="number"],
+.dark-theme input[type="date"],
+.dark-theme input[type="time"],
+.dark-theme select,
+.dark-theme textarea {
+    background-color: var(--bg-color-dark);
+    border-color: var(--border-color-dark);
+    color: var(--text-color-dark);
 }
 
-.task-form input:focus,
-.task-form select:focus,
-.new-category-input:focus,
-.task-form textarea:focus,
-.notes-section input:focus,
-.notes-section select:focus,
-.notes-section textarea:focus,
-.expense-form input[type="time"]:focus,
-.expense-form input[type="color"]:focus,
-.notes-form input:focus,
-.notes-form select:focus,
-.notes-form textarea:focus {
+input[type="text"]:focus,
+input[type="number"]:focus,
+input[type="date"]:focus,
+input[type="time"]:focus,
+select:focus,
+textarea:focus {
     outline: none;
-    border-color: var(--accent-color);
-    box-shadow: 0 0 0 3px rgba(var(--accent-color-rgb), 0.2);
+    border-color: var(--accent-color-light);
+    box-shadow: 0 0 0 2px rgba(0, 188, 212, 0.2); /* Accent color with transparency */
 }
 
-/* Subtask input group in Add Task form */
-.subtasks-group {
-    margin-top: 1.5rem;
-    padding-top: 1rem;
-    border-top: 1px dashed var(--border-color);
+.dark-theme input[type="text"]:focus,
+.dark-theme input[type="number"]:focus,
+.dark-theme input[type="date"]:focus,
+.dark-theme input[type="time"]:focus,
+.dark-theme select:focus,
+.dark-theme textarea:focus {
+    border-color: var(--accent-color-dark);
+    box-shadow: 0 0 0 2px rgba(38, 198, 218, 0.3);
 }
-.subtasks-group label {
-    margin-bottom: 0.75rem;
-}
-.subtask-input-group {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-bottom: 0.5rem;
-}
-.subtask-input-group input {
-    flex-grow: 1;
-    margin-bottom: 0; /* Override default form-group margin */
-}
-.subtask-input-group .remove-subtask-btn {
-    width: auto;
-    min-width: 35px; /* For the small 'x' button */
-    padding: 0.4rem;
-    margin-top: 0;
-    color: var(--expense-color);
-    border-color: var(--expense-color);
-}
-.subtask-input-group .remove-subtask-btn:hover {
-    background-color: var(--expense-color);
+
+
+/* Buttons */
+.btn {
+    display: inline-block;
+    padding: 0.7rem 1.2rem;
+    background-color: var(--accent-color-light);
     color: #FFFFFF;
-}
-
-
-/* Buttons (reused) */
-.primary-btn, .secondary-btn {
-    display: block;
-    width: 100%;
-    padding: 0.8rem 1.2rem;
     border: none;
-    border-radius: 8px;
-    font-family: var(--font-heading);
-    font-size: 1.1rem;
-    font-weight: 700;
+    border-radius: 5px;
     cursor: pointer;
+    font-size: 1rem;
+    font-weight: 600;
     transition: background-color 0.2s ease, transform 0.1s ease;
     text-align: center;
+    text-decoration: none;
+}
+
+.dark-theme .btn {
+    background-color: var(--accent-color-dark);
+}
+
+.btn:hover {
+    background-color: #0097A7; /* Slightly darker cyan */
+    transform: translateY(-1px);
+}
+.dark-theme .btn:hover {
+    background-color: #00BCD4; /* Slightly darker cyan for dark theme */
+}
+
+.btn:active {
+    transform: translateY(0);
+}
+
+.btn-secondary {
+    background-color: #6c757d; /* Grey */
+}
+.btn-secondary:hover {
+    background-color: #5a6268;
+}
+
+.btn-small {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.85rem;
+    border-radius: 4px;
+    margin-left: 0.5rem;
+}
+
+.btn-small i {
+    margin-right: 0.3rem;
+}
+
+
+/* List Styles (General) */
+.list {
+    list-style: none;
+    padding: 0;
     margin-top: 1rem;
 }
 
-.primary-btn {
-    background-color: var(--accent-color);
-    color: #FFFFFF;
-}
-.primary-btn:hover {
-    background-color: #00A9BE; /* Slightly darker cyan */
-    transform: translateY(-1px);
-}
-.dark-theme .primary-btn:hover {
-    background-color: #17B2C7; /* Adjust for dark theme hover */
-}
-
-
-.secondary-btn {
-    background-color: transparent;
-    color: var(--accent-color);
-    border: 2px solid var(--accent-color);
-    margin-top: 0.75rem;
-}
-.secondary-btn:hover {
-    background-color: var(--accent-color);
-    color: #FFFFFF;
-}
-.dark-theme .secondary-btn:hover {
-    background-color: var(--accent-color-dark); /* Adjust for dark theme hover */
-    color: var(--text-color-dark); /* Ensure readable text on hover for dark theme */
-}
-
-.secondary-btn.small-btn {
-    padding: 0.5rem 0.8rem;
-    font-size: 0.9rem;
-    margin-top: 0;
-}
-
-/* Category/Subject List (reused from expense tracker) */
-.category-list {
-    list-style: none;
-    padding: 0;
-    margin-bottom: 1.5rem;
-}
-.category-item {
+.list li {
+    background-color: var(--card-bg-light);
+    border: 1px solid var(--border-color-light);
+    border-radius: 8px;
+    padding: 0.8rem 1rem;
+    margin-bottom: 0.5rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0.8rem 1rem;
-    background-color: var(--bg-color); /* Lighter background for items within section */
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    margin-bottom: 0.5rem;
-    box-shadow: 0 1px 3px var(--shadow-color);
+    box-shadow: 0 1px 3px var(--shadow-color-light);
 }
-.dark-theme .category-item {
-    background-color: #4A4A4A;
+
+.dark-theme .list li {
+    background-color: var(--card-bg-dark);
     border-color: var(--border-color-dark);
     box-shadow: 0 1px 3px var(--shadow-color-dark);
 }
 
-.category-item span {
-    font-weight: 600;
-    color: var(--heading-color);
+.list li span {
+    flex-grow: 1;
+    color: var(--text-color-light);
 }
-.dark-theme .category-item span {
+.dark-theme .list li span {
+    color: var(--text-color-dark);
+}
+
+.list li .btn-small {
+    margin-left: 0.5rem;
+    white-space: nowrap; /* Prevent button text from wrapping */
+}
+
+.no-items {
+    text-align: center;
+    color: var(--text-color-light);
+    opacity: 0.7;
+    margin-top: 1rem;
+    font-style: italic;
+}
+.dark-theme .no-items {
+    color: var(--text-color-dark);
+}
+
+
+/* To-Do List Specific */
+.add-task-container {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.add-task-container input[type="text"] {
+    flex-grow: 1;
+}
+
+.task-list .task-item {
+    background-color: var(--card-bg-light);
+    border: 1px solid var(--border-color-light);
+    border-radius: 8px;
+    padding: 0.8rem 1rem;
+    margin-bottom: 0.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 1px 3px var(--shadow-color-light);
+    transition: all 0.3s ease;
+}
+
+.dark-theme .task-list .task-item {
+    background-color: var(--card-bg-dark);
+    border-color: var(--border-color-dark);
+    box-shadow: 0 1px 3px var(--shadow-color-dark);
+}
+
+.task-item.completed {
+    opacity: 0.7;
+    text-decoration: line-through;
+    background-color: #e0ffe0; /* Light green for completed */
+}
+.dark-theme .task-item.completed {
+    background-color: #3a4a3a; /* Darker green for completed */
+}
+
+
+.task-item .task-info {
+    display: flex;
+    align-items: center;
+    flex-grow: 1;
+    gap: 0.5rem;
+    font-size: 1rem;
+    color: var(--text-color-light);
+    flex-wrap: wrap; /* Allow wrapping for long descriptions/meta */
+}
+.dark-theme .task-item .task-info {
+    color: var(--text-color-dark);
+}
+
+
+.task-item input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    accent-color: var(--accent-color-light); /* Tint the checkbox */
+}
+.dark-theme .task-item input[type="checkbox"] {
+    accent-color: var(--accent-color-dark);
+}
+
+.task-item .task-meta {
+    font-size: 0.85rem;
+    color: #666;
+    margin-left: 0.5rem;
+}
+.dark-theme .task-item .task-meta {
+    color: #bbb;
+}
+
+.task-item .task-actions {
+    display: flex;
+    gap: 0.3rem;
+}
+
+/* Priority Colors */
+.task-item.high { border-left: 5px solid var(--expense-color-light); }
+.task-item.medium { border-left: 5px solid var(--accent-color-light); }
+.task-item.low { border-left: 5px solid #28A745; /* green for low priority */ }
+
+.dark-theme .task-item.high { border-left-color: var(--expense-color-dark); }
+.dark-theme .task-item.medium { border-left-color: var(--accent-color-dark); }
+.dark-theme .task-item.low { border-left-color: #4CAF50; }
+
+
+.subtasks-list {
+    list-style: disc;
+    margin-left: 1.5rem;
+    margin-top: 0.5rem;
+    width: 100%; /* Take full width below main task info */
+    font-size: 0.9rem;
+    color: #555;
+}
+.dark-theme .subtasks-list {
+    color: #ccc;
+}
+
+.subtask-input {
+    margin-bottom: 0.5rem;
+}
+
+/* Pomodoro Timer Specific */
+.pomodoro-timer-container {
+    background-color: var(--card-bg-light);
+    border: 1px solid var(--border-color-light);
+    border-radius: 8px;
+    padding: 1.5rem;
+    text-align: center;
+    margin-bottom: 1rem;
+    box-shadow: 0 1px 5px var(--shadow-color-light);
+}
+.dark-theme .pomodoro-timer-container {
+    background-color: var(--card-bg-dark);
+    border-color: var(--border-color-dark);
+    box-shadow: 0 1px 5px var(--shadow-color-dark);
+}
+
+
+.timer-display {
+    font-family: var(--font-heading);
+    font-size: 3rem;
+    font-weight: 700;
+    color: var(--accent-color-light);
+    margin-bottom: 1rem;
+}
+.dark-theme .timer-display {
+    color: var(--accent-color-dark);
+}
+
+.timer-controls button {
+    margin: 0 0.5rem;
+    min-width: 80px;
+}
+
+.timer-settings {
+    margin-top: 1.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1rem;
+    font-size: 0.9rem;
+}
+
+.timer-settings label {
+    color: var(--heading-color-light);
+}
+.dark-theme .timer-settings label {
     color: var(--heading-color-dark);
 }
 
-.category-item .action-buttons button {
-    background: none;
-    border: none;
-    color: var(--text-color);
-    font-size: 1rem;
-    cursor: pointer;
-    margin-left: 0.5rem;
-    opacity: 0.7;
-    transition: opacity 0.2s ease, color 0.2s ease;
-}
-.category-item .action-buttons button:hover {
-    opacity: 1;
-    color: var(--accent-color);
-}
-.category-item .action-buttons .delete-category-btn:hover {
-    color: var(--expense-color);
+.timer-settings input[type="number"] {
+    width: 60px;
+    text-align: center;
+    padding: 0.4rem;
 }
 
-/* Add Category/Subject Section Specifics */
-.add-category-section {
+
+/* Notes Specific */
+.notes-sections {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.add-subject-container {
     display: flex;
     gap: 0.5rem;
-    align-items: flex-end;
-    margin-bottom: 2rem; /* Add more space below */
-}
-.add-category-section .new-category-input {
-    flex-grow: 1;
-    margin-bottom: 0;
-}
-.add-category-section .primary-btn {
-    width: auto;
-    margin-top: 0;
-    white-space: nowrap;
-}
-
-/* Uploaded Notes List & Text Notes List (reusing transaction-list styles) */
-.transaction-list {
-    list-style: none;
-    padding: 0;
-}
-
-.transaction-item {
-    display: flex;
-    align-items: center;
-    background-color: var(--bg-color); /* Lighter background for items within card */
-    padding: 1rem;
-    margin-bottom: 0.75rem;
-    border-radius: 10px;
-    box-shadow: 0 2px 5px var(--shadow-color);
-    border-left: 5px solid transparent;
-}
-.dark-theme .transaction-item {
-    background-color: #4A4A4A;
-}
-
-.transaction-icon {
-    font-size: 1.5rem;
-    margin-right: 0.75rem;
-    width: 30px;
-    text-align: center;
-    flex-shrink: 0;
-}
-
-.transaction-info {
-    flex-grow: 1;
-    margin-right: 0.5rem;
-}
-
-.transaction-description {
-    font-weight: 600;
-    color: var(--heading-color);
-}
-
-.transaction-date, .transaction-category {
-    font-size: 0.85rem;
-    color: var(--text-color);
-    opacity: 0.8;
-}
-
-.transaction-actions {
-    display: flex;
-    gap: 0.5rem;
-    margin-left: 0.5rem;
-    flex-shrink: 0;
-}
-
-.transaction-actions button {
-    background: none;
-    border: none;
-    color: var(--text-color);
-    font-size: 1rem;
-    cursor: pointer;
-    opacity: 0.7;
-    transition: opacity 0.2s ease, color 0.2s ease;
-}
-.transaction-actions button:hover {
-    opacity: 1;
-    color: var(--accent-color);
-}
-.transaction-actions .delete-btn:hover {
-    color: var(--expense-color);
-}
-
-.transaction-item.income { /* For PDF notes, green border */
-    border-left-color: var(--income-color);
-}
-.transaction-item.income .transaction-icon {
-    color: var(--income-color);
-}
-.transaction-item.expense { /* For Text notes, blue/default border */
-    border-left-color: var(--accent-color);
-}
-.transaction-item.expense .transaction-icon {
-    color: var(--accent-color);
-}
-
-
-.no-items { /* Renamed from no-transactions to be more general */
-    text-align: center;
-    color: var(--text-color);
-    opacity: 0.7;
-    padding: 2rem;
-    font-style: italic;
-}
-.no-items p {
     margin-bottom: 1rem;
 }
-.no-items .primary-btn {
-    width: auto;
-    display: inline-block;
-    margin-top: 0.5rem;
-    padding: 0.6rem 1.2rem;
+
+.note-item, .pdf-item {
+    background-color: var(--card-bg-light);
+    border: 1px solid var(--border-color-light);
+    border-radius: 8px;
+    padding: 0.8rem 1rem;
+    margin-bottom: 0.5rem;
+    box-shadow: 0 1px 3px var(--shadow-color-light);
+    display: flex;
+    flex-direction: column; /* Stack info and actions */
+    gap: 0.5rem;
+}
+.dark-theme .note-item, .dark-theme .pdf-item {
+    background-color: var(--card-bg-dark);
+    border-color: var(--border-color-dark);
+    box-shadow: 0 1px 3px var(--shadow-color-dark);
+}
+
+.note-item h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    color: var(--heading-color-light);
+}
+.dark-theme .note-item h3 {
+    color: var(--heading-color-dark);
+}
+
+.note-item p {
+    margin: 0.3rem 0;
     font-size: 0.95rem;
+    color: var(--text-color-light);
+}
+.dark-theme .note-item p {
+    color: var(--text-color-dark);
+}
+
+.note-item .note-content-preview {
+    font-style: italic;
+    color: #777;
+    font-size: 0.85rem;
+}
+.dark-theme .note-item .note-content-preview {
+    color: #ccc;
+}
+
+.note-actions, .pdf-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.pdf-item span {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+}
+.pdf-item .fas.fa-file-pdf {
+    color: var(--expense-color-light); /* Red for PDF icon */
+}
+.dark-theme .pdf-item .fas.fa-file-pdf {
+    color: var(--expense-color-dark);
+}
+
+.pdf-item .pdf-subject {
+    font-size: 0.85rem;
+    font-weight: 400;
+    color: #777;
+}
+.dark-theme .pdf-item .pdf-subject {
+    color: #ccc;
 }
 
 
-/* Timetable Styles */
-.timetable-controls {
+/* Timetable Specific */
+.timetable-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    background-color: var(--card-bg-light);
+    border: 1px solid var(--border-color-light);
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    box-shadow: 0 1px 3px var(--shadow-color-light);
+}
+.dark-theme .timetable-nav {
+    background-color: var(--card-bg-dark);
+    border-color: var(--border-color-dark);
+    box-shadow: 0 1px 3px var(--shadow-color-dark);
+}
+
+
+.timetable-grid {
+    display: grid;
+    grid-template-columns: 60px repeat(7, 1fr); /* Time column + 7 days */
+    border: 1px solid var(--border-color-light);
+    border-radius: 8px;
+    overflow-x: auto; /* Enable horizontal scrolling for narrow screens */
+    margin-bottom: 1rem;
+    background-color: var(--card-bg-light);
+    box-shadow: 0 1px 5px var(--shadow-color-light);
+}
+.dark-theme .timetable-grid {
+    border-color: var(--border-color-dark);
+    background-color: var(--card-bg-dark);
+    box-shadow: 0 1px 5px var(--shadow-color-dark);
+}
+
+
+.timetable-row {
+    display: contents; /* Allows children to be placed directly in grid */
+}
+
+.timetable-cell {
+    padding: 0.5rem;
+    border: 1px solid var(--border-color-light);
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 1rem;
-    margin-bottom: 1.5rem;
-}
-.timetable-controls .month-display { /* Reusing month-display for week */
-    font-family: var(--font-heading);
-    font-size: 1.2rem;
-    font-weight: 700;
-    color: var(--heading-color);
-    min-width: 180px; /* Adjust width for week display */
+    min-height: 50px; /* Ensure cells have a minimum height */
     text-align: center;
+    color: var(--text-color-light);
+    font-size: 0.9rem;
+    flex-direction: column; /* For stacking schedule items */
+    gap: 0.2rem;
 }
-.timetable-controls .icon-btn {
-    background: none;
-    border: 1px solid var(--border-color);
-    border-radius: 50%;
-    width: 35px;
-    height: 35px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    font-size: 1rem;
-    color: var(--text-color);
-    transition: background-color 0.2s ease, border-color 0.2s ease;
-}
-.timetable-controls .icon-btn:hover {
-    background-color: var(--accent-color);
-    color: #FFFFFF;
-    border-color: var(--accent-color);
-}
-.dark-theme .timetable-controls .icon-btn {
+.dark-theme .timetable-cell {
     border-color: var(--border-color-dark);
     color: var(--text-color-dark);
 }
-.dark-theme .timetable-controls .icon-btn:hover {
+
+
+.timetable-header .timetable-cell {
+    background-color: var(--accent-color-light);
+    color: white;
+    font-weight: 700;
+    border-color: var(--accent-color-light); /* Match border to background */
+}
+.dark-theme .timetable-header .timetable-cell {
     background-color: var(--accent-color-dark);
     border-color: var(--accent-color-dark);
 }
 
-.timetable-grid {
-    display: grid;
-    grid-template-columns: 0.8fr repeat(7, 1fr); /* Time column + 7 days */
-    gap: 2px; /* Small gap between cells */
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    overflow-x: auto; /* Enable horizontal scrolling if needed */
-    margin-bottom: 1.5rem;
-    background-color: var(--border-color); /* Grid lines */
-}
-.dark-theme .timetable-grid {
-    border-color: var(--border-color-dark);
-    background-color: var(--border-color-dark);
-}
 
-.grid-header, .time-slot, .schedule-cell {
-    padding: 0.5rem;
-    text-align: center;
-    background-color: var(--card-bg);
-    color: var(--text-color);
-    font-size: 0.85rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 60px; /* Minimum width for day columns */
-    min-height: 50px; /* Minimum height for rows */
-}
-.dark-theme .grid-header, .dark-theme .time-slot, .dark-theme .schedule-cell {
-    background-color: var(--card-bg-dark);
-    color: var(--text-color-dark);
-}
-
-.grid-header {
-    font-weight: 700;
-    color: var(--heading-color);
-    background-color: var(--bg-color); /* Header row background */
-    position: sticky;
-    top: 0;
-    z-index: 2; /* Keep headers visible on scroll */
-}
-.dark-theme .grid-header {
-    background-color: var(--bg-color-dark);
-    color: var(--heading-color-dark);
-}
-
-.grid-header:first-child {
-    position: sticky;
-    left: 0;
-    z-index: 3; /* Keep time header visible on horizontal scroll */
-}
-.time-slot {
+.time-col {
+    background-color: var(--bg-color-light);
     font-weight: 600;
-    background-color: var(--bg-color); /* Time column background */
     position: sticky;
     left: 0;
-    z-index: 1; /* Keep time column visible on horizontal scroll */
+    z-index: 2; /* Keep time column visible on scroll */
 }
-.dark-theme .time-slot {
+.dark-theme .time-col {
     background-color: var(--bg-color-dark);
 }
 
-.schedule-cell {
-    border: 1px solid var(--border-color);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    cursor: pointer;
-    transition: background-color 0.1s ease;
-    position: relative;
-    display: flex; /* To center content */
-    align-items: center;
-    justify-content: center;
-}
-.dark-theme .schedule-cell {
-    border-color: var(--border-color-dark);
-}
 
-.schedule-cell.has-item {
-    /* Background set by inline style for specific color */
-    color: #FFFFFF; /* Ensure white text on colored background */
-    font-weight: 600;
-}
-.schedule-cell.has-item:hover {
-    opacity: 0.9;
-}
-
-.schedule-item-content {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 0.2rem;
+.schedule-item {
+    background-color: var(--accent-color-light);
+    color: white;
+    padding: 0.3rem 0.5rem;
+    border-radius: 4px;
     font-size: 0.75rem;
-    line-height: 1.2;
+    width: 95%; /* Take most of the cell width */
     overflow: hidden;
-    white-space: normal; /* Allow text to wrap within the item */
-    word-break: break-word; /* Break long words */
-    background-color: var(--accent-color); /* Default background, overridden by inline style */
-    color: #FFFFFF;
-    border-radius: 5px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    cursor: pointer;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+.dark-theme .schedule-item {
+    background-color: var(--accent-color-dark);
 }
 
 
-/* Backup/Restore Section Specific Styles (reused) */
-.backup-restore-actions {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    margin-top: 1.5rem;
-}
-.backup-restore-actions .primary-btn,
-.backup-restore-actions .secondary-btn {
-    margin-top: 0;
-}
-.backup-restore-actions .primary-btn i,
-.backup-restore-actions .secondary-btn i {
-    margin-right: 0.5rem;
-}
-
-
-/* Calculator Overlay Styles (reused) */
+/* Calculator Styling */
 .calculator-container {
-    position: fixed;
-    bottom: 0;
+    position: absolute;
+    top: 50%;
     left: 50%;
-    transform: translateX(-50%);
-    width: 100%;
-    max-width: 450px;
-    background-color: var(--card-bg);
-    border-top-left-radius: 15px;
-    border-top-right-radius: 15px;
-    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.2);
+    transform: translate(-50%, -50%);
+    background-color: var(--card-bg-light);
+    border: 1px solid var(--border-color-light);
+    border-radius: 10px;
+    box-shadow: 0 5px 15px var(--shadow-color-light);
     padding: 1rem;
-    z-index: 100;
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    width: 90%;
+    max-width: 320px; /* Standard calculator width */
+    z-index: 100; /* On top of other content */
 }
 .dark-theme .calculator-container {
     background-color: var(--card-bg-dark);
-    box-shadow: 0 -4px 20px var(--shadow-color-dark);
+    border-color: var(--border-color-dark);
+    box-shadow: 0 5px 15px var(--shadow-color-dark);
 }
 
-.calculator-display input {
+
+.calc-output {
     width: 100%;
-    padding: 1rem;
+    height: 60px;
+    background-color: #333;
+    color: #FFFFFF;
+    font-family: 'Roboto Mono', monospace; /* Monospace for numbers */
     font-size: 2.2rem;
     text-align: right;
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    background-color: var(--bg-color);
-    color: var(--heading-color);
-    font-family: var(--font-heading);
-    font-weight: 700;
-}
-.dark-theme .calculator-display input {
-    background-color: var(--bg-color-dark);
-    border-color: var(--border-color-dark);
-    color: var(--heading-color-dark);
+    padding: 0.5rem;
+    border: none;
+    border-radius: 5px;
+    margin-bottom: 0.8rem;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
-.calculator-buttons {
+.calc-buttons {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 0.5rem;
 }
 
 .calc-btn {
-    background-color: var(--bg-color);
-    color: var(--text-color);
+    background-color: #f0f0f0;
+    color: var(--text-color-light);
     border: none;
+    border-radius: 8px;
     padding: 1rem;
     font-size: 1.2rem;
-    border-radius: 8px;
+    font-weight: 600;
     cursor: pointer;
-    transition: background-color 0.2s ease, color 0.2s ease;
+    transition: background-color 0.2s ease;
 }
 .dark-theme .calc-btn {
-    background-color: var(--bg-color-dark);
+    background-color: #555;
     color: var(--text-color-dark);
 }
 
+
 .calc-btn:hover {
-    background-color: var(--border-color);
+    background-color: #e0e0e0;
 }
 .dark-theme .calc-btn:hover {
-    background-color: var(--border-color-dark);
+    background-color: #666;
 }
 
-.calc-btn.operator, .calc-btn.equals {
-    background-color: var(--accent-color);
+
+.calc-operator {
+    background-color: var(--accent-color-light);
     color: #FFFFFF;
 }
-.calc-btn.operator:hover, .calc-btn.equals:hover {
-    background-color: #00A9BE; /* Darker cyan */
+.calc-operator:hover {
+    background-color: #0097A7;
 }
-.dark-theme .calc-btn.operator, .dark-theme .calc-btn.equals {
+.dark-theme .calc-operator {
     background-color: var(--accent-color-dark);
 }
-.dark-theme .calc-btn.operator:hover, .dark-theme .calc-btn.equals:hover {
-    background-color: #17B2C7;
+.dark-theme .calc-operator:hover {
+    background-color: #00BCD4;
 }
 
 
-.calc-btn.clear {
-    background-color: var(--expense-color);
-    color: #FFFFFF;
+.calc-btn[data-action="clear"],
+.calc-btn[data-action="negative"],
+.calc-btn[data-action="percent"] {
+    background-color: #dcdcdc;
+    color: var(--heading-color-light);
 }
-.calc-btn.clear:hover {
-    background-color: #C82333;
-}
-.dark-theme .calc-btn.clear {
-    background-color: var(--expense-color-dark);
-}
-.dark-theme .calc-btn.clear:hover {
-    background-color: #EB4C5A;
-}
-
-.calc-btn.backspace {
-    background-color: #6C757D; /* Grey */
-    color: #FFFFFF;
-}
-.calc-btn.backspace:hover {
-    background-color: #5A6268;
-}
-.dark-theme .calc-btn.backspace {
-    background-color: #555555;
-}
-.dark-theme .calc-btn.backspace:hover {
-    background-color: #6A6A6A;
+.dark-theme .calc-btn[data-action="clear"],
+.dark-theme .calc-btn[data-action="negative"],
+.dark-theme .calc-btn[data-action="percent"] {
+    background-color: #666;
+    color: var(--heading-color-dark);
 }
 
-.calc-btn.zero {
+.calc-btn[data-action="clear"]:hover,
+.calc-btn[data-action="negative"]:hover,
+.calc-btn[data-action="percent"]:hover {
+    background-color: #c0c0c0;
+}
+.dark-theme .calc-btn[data-action="clear"]:hover,
+.dark-theme .calc-btn[data-action="negative"]:hover,
+.dark-theme .calc-btn[data-action="percent"]:hover {
+    background-color: #777;
+}
+
+
+.calc-btn.zero-btn {
     grid-column: span 2; /* Make the 0 button wider */
 }
 
 .calc-btn.apply-calc {
-    background-color: var(--income-color); /* Green for apply */
+    background-color: var(--income-color-light); /* Green for apply */
     color: #FFFFFF;
 }
 .calc-btn.apply-calc:hover {
@@ -977,14 +833,14 @@ body {
     display: flex;
     justify-content: space-around;
     padding: 0.5rem 0;
-    background-color: var(--card-bg);
-    border-top: 1px solid var(--border-color);
+    background-color: var(--card-bg-light);
+    border-top: 1px solid var(--border-color-light);
     position: sticky;
     bottom: 0;
     left: 0;
     width: 100%;
     z-index: 50;
-    box-shadow: 0 -2px 10px var(--shadow-color);
+    box-shadow: 0 -2px 10px var(--shadow-color-light);
 }
 .dark-theme .bottom-nav {
     background-color: var(--card-bg-dark);
@@ -993,32 +849,40 @@ body {
 }
 
 .nav-item {
-    flex: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    background: none;
-    border: none;
-    color: var(--text-color);
+    color: #888;
     font-size: 0.75rem;
-    padding: 0.5rem 0;
     cursor: pointer;
-    transition: color 0.2s ease;
+    padding: 0.3rem;
+    border-radius: 5px;
+    transition: color 0.2s ease, background-color 0.2s ease;
 }
+
 .dark-theme .nav-item {
-    color: var(--text-color-dark);
+    color: #bbb;
 }
 
 .nav-item i {
-    font-size: 1.3rem;
+    font-size: 1.2rem;
     margin-bottom: 0.2rem;
 }
 
 .nav-item.active {
-    color: var(--accent-color);
-    font-weight: 600;
+    color: var(--accent-color-light);
+    background-color: rgba(0, 188, 212, 0.1); /* Light accent background */
 }
-.nav-item:hover {
-    color: var(--accent-color);
+.dark-theme .nav-item.active {
+    color: var(--accent-color-dark);
+    background-color: rgba(38, 198, 218, 0.2);
+}
+
+.nav-item:hover:not(.active) {
+    color: var(--heading-color-light);
+    background-color: rgba(0, 0, 0, 0.05);
+}
+.dark-theme .nav-item:hover:not(.active) {
+    color: var(--heading-color-dark);
+    background-color: rgba(255, 255, 255, 0.1);
 }
