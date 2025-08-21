@@ -1,0 +1,1132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Study Hub</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <link rel="icon" type="image/png" href="icon2_192x192.png" sizes="192x192">
+    <link rel="icon" type="image/png" href="icon2_512x512.png" sizes="512x512">
+    <link rel="apple-touch-icon" href="icon2_180x180.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container" data-theme="light">
+        <header class="header">
+            <div class="header-left">
+                <button id="menuToggle" class="icon-button menu-toggle-btn"><i class="fas fa-bars"></i></button>
+                <h1 class="app-title">My Study Hub</h1>
+            </div>
+            <div class="header-right">
+                <button id="darkModeToggle" class="icon-button"><i class="fas fa-moon"></i></button>
+                <button id="calculatorButton" class="icon-button"><i class="fas fa-calculator"></i></button>
+            </div>
+        </header>
+
+        <div class="main-layout">
+            <nav id="sidebar" class="sidebar">
+                <button class="nav-button active" data-target="notesSection">
+                    <i class="fas fa-book"></i>
+                    <span>Notes</span>
+                </button>
+                <button class="nav-button" data-target="todoSection">
+                    <i class="fas fa-list-check"></i>
+                    <span>To-Do</span>
+                </button>
+                <button class="nav-button" data-target="timetableSection">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>Timetable</span>
+                </button>
+                <button class="nav-button" data-target="homeworkSection">
+                    <i class="fas fa-clipboard-check"></i>
+                    <span>Homework</span>
+                </button>
+                <button class="nav-button" data-target="linksSection">
+                    <i class="fas fa-link"></i>
+                    <span>Links</span>
+                </button>
+                <button class="nav-button" data-target="pomodoroSection">
+                    <i class="fas fa-clock"></i>
+                    <span>Pomodoro</span>
+                </button>
+                <button class="nav-button" data-target="backupRestoreSection">
+                    <i class="fas fa-cloud-arrow-up"></i>
+                    <span>Backup</span>
+                </button>
+            </nav>
+
+            <main class="content">
+                <section id="notesSection" class="section active">
+                    <div class="section-header">
+                        <h2>📚 Notes Section</h2>
+                        <button id="createNewNoteBtn" class="add-new-btn"><i class="fas fa-plus"></i> New Note</button>
+                    </div>
+                    <div class="notes-container">
+                        <h3>Your Notes</h3>
+                        <ul id="notesList" class="styled-list notes-list">
+                            <p class="placeholder-text">No notes yet. Click 'New Note' to create one!</p>
+                        </ul>
+                        <h3 class="mt-30">Current Note: <span id="currentNoteTitleDisplay">Not Loaded</span></h3>
+                        <div id="editor"></div>
+                        <button id="saveCurrentNoteBtn" class="action-btn save-btn mt-15"><i class="fas fa-save"></i> Save Note</button>
+                        <p class="small-text">Notes are saved in your browser's local storage.</p>
+                        <h3 class="mt-30">PDF Notes (Local Storage - Limited Capacity)</h3>
+                        <div class="pdf-upload-area">
+                            <p>Upload your PDF notes here:</p>
+                            <input type="file" id="pdfUploadInput" accept=".pdf">
+                            <button id="uploadPdfBtn" class="action-btn"><i class="fas fa-upload"></i> Upload PDF</button>
+                            <p class="small-text">Warning: Storing large PDFs in local storage is not recommended.</p>
+                            <div id="pdfList" class="pdf-list"></div>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="todoSection" class="section">
+                    <div class="section-header">
+                        <h2>📝 To-Do List</h2>
+                    </div>
+                    <div class="todo-input-group">
+                        <input type="text" id="todoInput" placeholder="Enter new task..." class="text-input">
+                        <button id="addTodoItemBtn" class="action-btn"><i class="fas fa-plus"></i> Add</button>
+                    </div>
+                    <ul id="todoList" class="styled-list"></ul>
+                    <p class="small-text">To-Do items are saved in your browser's local storage.</p>
+                </section>
+
+                <section id="timetableSection" class="section">
+                    <div class="section-header">
+                        <h2>📅 Editable Timetable</h2>
+                    </div>
+                    <div class="timetable-grid">
+                        <p class="small-text">Timetable data is saved in your browser's local storage.</p>
+                        <table class="timetable-table">
+                            <thead>
+                                <tr>
+                                    <th>Time</th>
+                                    <th>Monday</th>
+                                    <th>Tuesday</th>
+                                    <th>Wednesday</th>
+                                    <th>Thursday</th>
+                                    <th>Friday</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                        <button id="saveTimetableBtn" class="action-btn save-btn mt-20"><i class="fas fa-save"></i> Save Timetable</button>
+                    </div>
+                </section>
+
+                <section id="homeworkSection" class="section">
+                    <div class="section-header">
+                        <h2>📚 Homework</h2>
+                    </div>
+                    <div class="homework-input-group">
+                        <input type="text" id="homeworkInput" placeholder="e.g., Math Ch 3 exercises" class="text-input">
+                        <input type="date" id="homeworkDueDate" class="text-input">
+                        <button id="addHomeworkItemBtn" class="action-btn"><i class="fas fa-plus"></i> Add</button>
+                    </div>
+                    <ul id="homeworkList" class="styled-list"></ul>
+                    <p class="small-text">Homework items are saved in your browser's local storage.</p>
+                </section>
+
+                <section id="linksSection" class="section">
+                    <div class="section-header">
+                        <h2>🔗 Links Section</h2>
+                    </div>
+                    <div class="link-input-group">
+                        <input type="text" id="linkNameInput" placeholder="Link Name" class="text-input">
+                        <input type="url" id="linkUrlInput" placeholder="https://example.com" class="text-input">
+                        <button id="addLinkItemBtn" class="action-btn"><i class="fas fa-plus"></i> Add</button>
+                    </div>
+                    <ul id="linksList" class="styled-list"></ul>
+                    <p class="small-text">Links are saved in your browser's local storage.</p>
+                </section>
+
+                <section id="pomodoroSection" class="section">
+                    <div class="section-header">
+                        <h2>⏰ Pomodoro Timer</h2>
+                    </div>
+                    <div class="timer-display-container">
+                        <div class="timer-display" id="pomodoroTimerDisplay">25:00</div>
+                        <p class="timer-status" id="pomodoroStatus">Work Session</p>
+                    </div>
+                    <div class="timer-controls">
+                        <button id="startTimerBtn" class="action-btn start-btn"><i class="fas fa-play"></i> Start</button>
+                        <button id="pauseTimerBtn" class="action-btn pause-btn"><i class="fas fa-pause"></i> Pause</button>
+                        <button id="resetTimerBtn" class="action-btn reset-btn"><i class="fas fa-redo-alt"></i> Reset</button>
+                    </div>
+                    <div class="timer-settings">
+                        <div class="input-group">
+                            <label for="workTime">Work (min):</label>
+                            <input type="number" id="workTime" value="25" min="1" class="time-input">
+                        </div>
+                        <div class="input-group">
+                            <label for="breakTime">Break (min):</label>
+                            <input type="number" id="breakTime" value="5" min="1" class="time-input">
+                        </div>
+                    </div>
+                </section>
+
+                <section id="backupRestoreSection" class="section">
+                    <div class="section-header">
+                        <h2>☁️ Backup & Restore</h2>
+                    </div>
+                    <div class="backup-restore-area">
+                        <p class="small-text">Export all your data (notes, to-dos, timetable, etc.) to a JSON file.</p>
+                        <button id="exportDataBtn" class="action-btn"><i class="fas fa-download"></i> Export Data</button>
+                        <div class="import-section mt-15">
+                            <p class="small-text">Import data from a previously exported JSON backup file.</p>
+                            <input type="file" id="importFileInput" accept=".json">
+                            <button id="importDataBtn" class="action-btn save-btn"><i class="fas fa-upload"></i> Import Data</button>
+                            <p class="small-text import-warning">Warning: Importing data will overwrite your current data. Be careful!</p>
+                        </div>
+                    </div>
+                </section>
+            </main>
+        </div>
+
+        <div id="calculatorModal" class="modal">
+            <div class="modal-content calculator-content">
+                <span class="close-button" id="closeCalculatorBtn">&times;</span>
+                <h3>Calculator</h3>
+                <div class="calculator">
+                    <input type="text" class="calculator-display" id="calcDisplay" value="0" readonly>
+                    <div class="calculator-buttons">
+                        <button class="btn clear" data-action="clear">C</button>
+                        <button class="btn backspace" data-action="backspace"><i class="fas fa-backspace"></i></button>
+                        <button class="btn operator" data-value="%">%</button>
+                        <button class="btn operator" data-value="/">/</button>
+
+                        <button class="btn number" data-value="7">7</button>
+                        <button class="btn number" data-value="8">8</button>
+                        <button class="btn number" data-value="9">9</button>
+                        <button class="btn operator" data-value="*">x</button>
+
+                        <button class="btn number" data-value="4">4</button>
+                        <button class="btn number" data-value="5">5</button>
+                        <button class="btn number" data-value="6">6</button>
+                        <button class="btn operator" data-value="-">-</button>
+
+                        <button class="btn number" data-value="1">1</button>
+                        <button class="btn number" data-value="2">2</button>
+                        <button class="btn number" data-value="3">3</button>
+                        <button class="btn operator" data-value="+">+</button>
+
+                        <button class="btn number zero" data-value="0">0</button>
+                        <button class="btn number" data-value=".">.</button>
+                        <button class="btn equals" data-action="equals">=</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const navButtons = document.querySelectorAll('.nav-button');
+            const sections = document.querySelectorAll('.section');
+            const darkModeToggle = document.getElementById('darkModeToggle');
+            const calculatorButton = document.getElementById('calculatorButton');
+            const calculatorModal = document.getElementById('calculatorModal');
+            const closeCalculatorBtn = document.getElementById('closeCalculatorBtn');
+
+            const menuToggle = document.getElementById('menuToggle');
+            const sidebar = document.getElementById('sidebar');
+
+            // --- Utility Functions ---
+            function generateUniqueId() {
+                return '_' + Math.random().toString(36).substr(2, 9);
+            }
+
+            function reloadAllData() {
+                allNotes = JSON.parse(localStorage.getItem('allNotes')) || [];
+                todos = JSON.parse(localStorage.getItem('todos')) || [];
+                homeworks = JSON.parse(localStorage.getItem('homeworks')) || [];
+                links = JSON.parse(localStorage.getItem('links')) || [];
+                pdfs = JSON.parse(localStorage.getItem('pdfs')) || [];
+                activeNoteId = localStorage.getItem('activeNoteId');
+
+                renderNotesList();
+                if (activeNoteId) {
+                    loadNoteIntoEditor(activeNoteId);
+                } else if (allNotes.length > 0) {
+                    loadNoteIntoEditor(allNotes[0].id);
+                } else {
+                    editor.setContents([{ insert: 'Welcome to your Study Hub Notes! Click "New Note" to create one!' }]);
+                    currentNoteTitleDisplay.textContent = 'Not Loaded';
+                }
+
+                renderPdfs();
+                renderTodos();
+                loadTimetable();
+                renderHomeworks();
+                renderLinks();
+                loadDarkModePreference();
+                alert('All data reloaded!');
+            }
+
+
+            // --- Dark Mode Functionality ---
+            function loadDarkModePreference() {
+                const isDarkMode = localStorage.getItem('darkMode') === 'enabled';
+                if (isDarkMode) {
+                    document.body.classList.add('dark-mode');
+                } else {
+                    document.body.classList.remove('dark-mode');
+                }
+            }
+
+            darkModeToggle.addEventListener('click', () => {
+                document.body.classList.toggle('dark-mode');
+                if (document.body.classList.contains('dark-mode')) {
+                    localStorage.setItem('darkMode', 'enabled');
+                } else {
+                    localStorage.setItem('darkMode', 'disabled');
+                }
+            });
+
+            loadDarkModePreference();
+
+            // --- Navigation Functionality ---
+            function showSection(targetId) {
+                sections.forEach(section => {
+                    section.classList.remove('active');
+                });
+                document.getElementById(targetId).classList.add('active');
+
+                navButtons.forEach(button => {
+                    button.classList.remove('active');
+                });
+                document.querySelector(`.nav-button[data-target="${targetId}"]`).classList.add('active');
+                
+                if (window.innerWidth <= 768) {
+                    sidebar.classList.remove('active');
+                }
+            }
+
+            showSection('notesSection');
+
+            navButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const targetId = button.dataset.target;
+                    showSection(targetId);
+                });
+            });
+
+            menuToggle.addEventListener('click', () => {
+                sidebar.classList.toggle('active');
+            });
+
+
+            // --- Calculator Functionality ---
+            calculatorModal.style.display = 'none';
+
+            calculatorButton.addEventListener('click', () => {
+                calculatorModal.style.display = 'flex';
+            });
+
+            closeCalculatorBtn.addEventListener('click', () => {
+                calculatorModal.style.display = 'none';
+            });
+
+            window.addEventListener('click', (event) => {
+                if (event.target == calculatorModal) {
+                    calculatorModal.style.display = 'none';
+                }
+            });
+
+            const calcDisplay = document.getElementById('calcDisplay');
+            const calcButtons = document.querySelector('.calculator-buttons');
+            let currentInput = '0';
+            let operator = null;
+            let firstOperand = null;
+            let waitingForSecondOperand = false;
+
+            function updateDisplay() {
+                calcDisplay.value = currentInput;
+            }
+
+            function inputDigit(digit) {
+                if (waitingForSecondOperand) {
+                    currentInput = digit;
+                    waitingForSecondOperand = false;
+                } else {
+                    currentInput = currentInput === '0' ? digit : currentInput + digit;
+                }
+                updateDisplay();
+            }
+
+            function inputDecimal(dot) {
+                if (waitingForSecondOperand) {
+                    currentInput = '0.';
+                    waitingForSecondOperand = false;
+                } else if (!currentInput.includes(dot)) {
+                    currentInput += dot;
+                }
+                updateDisplay();
+            }
+
+            function handleOperator(nextOperator) {
+                const inputValue = parseFloat(currentInput);
+
+                if (operator && waitingForSecondOperand) {
+                    operator = nextOperator;
+                    return;
+                }
+
+                if (firstOperand === null) {
+                    firstOperand = inputValue;
+                } else if (operator) {
+                    const result = operate(firstOperand, inputValue, operator);
+                    currentInput = String(result);
+                    firstOperand = result;
+                }
+
+                waitingForSecondOperand = true;
+                operator = nextOperator;
+                updateDisplay();
+            }
+
+            function operate(num1, num2, op) {
+                if (op === '+') return num1 + num2;
+                if (op === '-') return num1 - num2;
+                if (op === '*') return num1 * num2;
+                if (op === '/') {
+                    if (num2 === 0) {
+                        alert("Cannot divide by zero!");
+                        return 'Error';
+                    }
+                    return num1 / num2;
+                }
+                if (op === '%') return (num1 / 100) * num2;
+                return num2;
+            }
+
+            function resetCalculator() {
+                currentInput = '0';
+                operator = null;
+                firstOperand = null;
+                waitingForSecondOperand = false;
+                updateDisplay();
+            }
+
+            function backspace() {
+                currentInput = currentInput.slice(0, -1);
+                if (currentInput === '' || currentInput === '-') {
+                    currentInput = '0';
+                }
+                updateDisplay();
+            }
+
+            calcButtons.addEventListener('click', (event) => {
+                const { target } = event;
+                if (!target.matches('button')) {
+                    return;
+                }
+
+                if (target.classList.contains('number')) {
+                    inputDigit(target.dataset.value);
+                    return;
+                }
+
+                if (target.dataset.value === '.') {
+                    inputDecimal(target.dataset.value);
+                    return;
+                }
+
+                if (target.classList.contains('operator')) {
+                    handleOperator(target.dataset.value);
+                    return;
+                }
+
+                if (target.dataset.action === 'equals') {
+                    if (operator && firstOperand !== null) {
+                        const result = operate(firstOperand, parseFloat(currentInput), operator);
+                        currentInput = String(result);
+                        firstOperand = null;
+                        operator = null;
+                        waitingForSecondOperand = false;
+                        updateDisplay();
+                    }
+                    return;
+                }
+
+                if (target.dataset.action === 'clear') {
+                    resetCalculator();
+                    return;
+                }
+
+                if (target.dataset.action === 'backspace') {
+                    backspace();
+                    return;
+                }
+            });
+
+            updateDisplay();
+
+            // --- Notes Section Functionality (Updated for Courses) ---
+            const editor = new Quill('#editor', {
+                theme: 'snow',
+                placeholder: 'Start writing your notes here...',
+                modules: {
+                    toolbar: [
+                        ['bold', 'italic', 'underline', 'strike'],
+                        ['blockquote', 'code-block'],
+                        [{ 'header': 1 }, { 'header': 2 }],
+                        [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                        [{ 'script': 'sub' }, { 'script': 'super' }],
+                        [{ 'indent': '-1' }, { 'indent': '+1' }],
+                        [{ 'direction': 'rtl' }],
+                        [{ 'size': ['small', false, 'large', 'huge'] }],
+                        [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+                        [{ 'color': [] }, { 'background': [] }],
+                        [{ 'font': [] }],
+                        [{ 'align': [] }],
+                        ['clean']
+                    ]
+                }
+            });
+
+            const createNewNoteBtn = document.getElementById('createNewNoteBtn');
+            const saveCurrentNoteBtn = document.getElementById('saveCurrentNoteBtn');
+            const notesListElement = document.getElementById('notesList');
+            const currentNoteTitleDisplay = document.getElementById('currentNoteTitleDisplay');
+
+            let allNotes = JSON.parse(localStorage.getItem('allNotes')) || [];
+            let activeNoteId = localStorage.getItem('activeNoteId');
+
+            function renderNotesList() {
+                notesListElement.innerHTML = '';
+                if (allNotes.length === 0) {
+                    notesListElement.innerHTML = '<p class="placeholder-text">No notes yet. Click \'New Note\' to create one!</p>';
+                    return;
+                }
+
+                allNotes.forEach(note => {
+                    const li = document.createElement('li');
+                    li.className = `note-item ${note.id === activeNoteId ? 'active-note' : ''}`;
+                    li.dataset.noteId = note.id;
+                    li.innerHTML = `
+                        <span class="note-title">${note.title}</span>
+                        ${note.course ? `<span class="course-tag">${note.course}</span>` : ''}
+                        <div class="note-actions">
+                            <button class="load-note-btn action-btn small-btn" data-note-id="${note.id}" title="Load Note"><i class="fas fa-folder-open"></i></button>
+                            <button class="delete-note-btn action-btn small-btn delete-btn" data-note-id="${note.id}" title="Delete Note"><i class="fas fa-trash"></i></button>
+                        </div>
+                    `;
+                    notesListElement.appendChild(li);
+                });
+            }
+
+            function loadNoteIntoEditor(noteId) {
+                const noteToLoad = allNotes.find(note => note.id === noteId);
+                if (noteToLoad) {
+                    if (activeNoteId && activeNoteId !== noteId) {
+                        const currentNote = allNotes.find(note => note.id === activeNoteId);
+                        if (currentNote) {
+                            currentNote.content = JSON.stringify(editor.getContents());
+                            localStorage.setItem('allNotes', JSON.stringify(allNotes));
+                        }
+                    }
+                    editor.setContents(JSON.parse(noteToLoad.content));
+                    currentNoteTitleDisplay.textContent = noteToLoad.title;
+                    activeNoteId = noteId;
+                    localStorage.setItem('activeNoteId', activeNoteId);
+                    renderNotesList();
+                } else {
+                    editor.setContents([{ insert: 'Note not found. Create a new one.' }]);
+                    currentNoteTitleDisplay.textContent = 'Not Loaded';
+                    activeNoteId = null;
+                    localStorage.removeItem('activeNoteId');
+                    renderNotesList();
+                }
+            }
+
+            createNewNoteBtn.addEventListener('click', () => {
+                const noteTitle = prompt("Enter a title for your new note:");
+                if (!noteTitle || noteTitle.trim() === "") {
+                    alert("Note title cannot be empty!");
+                    return;
+                }
+                const course = prompt("Enter the course for this note (optional):");
+
+                if (activeNoteId) {
+                    const currentNote = allNotes.find(note => note.id === activeNoteId);
+                    if (currentNote) {
+                        currentNote.content = JSON.stringify(editor.getContents());
+                        localStorage.setItem('allNotes', JSON.stringify(allNotes));
+                    }
+                }
+                const newNote = {
+                    id: generateUniqueId(),
+                    title: noteTitle.trim(),
+                    course: course ? course.trim() : null,
+                    content: JSON.stringify([{ insert: 'Start writing your new note here...' }]),
+                    createdAt: new Date().toISOString()
+                };
+                allNotes.push(newNote);
+                localStorage.setItem('allNotes', JSON.stringify(allNotes));
+                loadNoteIntoEditor(newNote.id);
+                alert(`New note "${newNote.title}" created!`);
+            });
+
+            saveCurrentNoteBtn.addEventListener('click', () => {
+                if (activeNoteId) {
+                    const noteToSave = allNotes.find(note => note.id === activeNoteId);
+                    if (noteToSave) {
+                        noteToSave.content = JSON.stringify(editor.getContents());
+                        localStorage.setItem('allNotes', JSON.stringify(allNotes));
+                        alert(`Note "${noteToSave.title}" saved!`);
+                    }
+                } else {
+                    alert("No note selected. Create a new note first!");
+                }
+            });
+
+            notesListElement.addEventListener('click', (event) => {
+                const target = event.target;
+                const loadBtn = target.closest('.load-note-btn');
+                const deleteBtn = target.closest('.delete-note-btn');
+
+                if (loadBtn) {
+                    const noteId = loadBtn.dataset.noteId;
+                    loadNoteIntoEditor(noteId);
+                } else if (deleteBtn) {
+                    const noteId = deleteBtn.dataset.noteId;
+                    const noteTitleToDelete = allNotes.find(note => note.id === noteId)?.title || "this note";
+
+                    if (confirm(`Are you sure you want to delete "${noteTitleToDelete}"?`)) {
+                        allNotes = allNotes.filter(note => note.id !== noteId);
+                        localStorage.setItem('allNotes', JSON.stringify(allNotes));
+                        renderNotesList();
+                        if (activeNoteId === noteId) {
+                            editor.setContents([{ insert: 'Note deleted. Create or load another note.' }]);
+                            currentNoteTitleDisplay.textContent = 'Not Loaded';
+                            activeNoteId = null;
+                            localStorage.removeItem('activeNoteId');
+                        }
+                        alert('Note deleted.');
+                    }
+                }
+            });
+
+            renderNotesList();
+            if (activeNoteId) {
+                loadNoteIntoEditor(activeNoteId);
+            } else if (allNotes.length > 0) {
+                loadNoteIntoEditor(allNotes[0].id);
+            } else {
+                editor.setContents([{ insert: 'Welcome to your Study Hub Notes! Click "New Note" to get started.' }]);
+                currentNoteTitleDisplay.textContent = 'Not Loaded';
+            }
+
+
+            // --- PDF Notes ---
+            const pdfUploadInput = document.getElementById('pdfUploadInput');
+            const uploadPdfBtn = document.getElementById('uploadPdfBtn');
+            const pdfList = document.getElementById('pdfList');
+
+            let pdfs = JSON.parse(localStorage.getItem('pdfs')) || [];
+
+            function renderPdfs() {
+                pdfList.innerHTML = '';
+                if (pdfs.length === 0) {
+                    pdfList.innerHTML = '<p class="placeholder-text">No PDFs uploaded yet.</p>';
+                    return;
+                }
+                pdfs.forEach((pdf, index) => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `
+                        <span>${pdf.name}</span>
+                        <div class="pdf-actions">
+                            <button class="view-pdf-btn action-btn small-btn" data-index="${index}"><i class="fas fa-eye"></i> View</button>
+                            <button class="delete-pdf-btn action-btn small-btn delete-btn" data-index="${index}"><i class="fas fa-trash"></i> Delete</button>
+                        </div>
+                    `;
+                    pdfList.appendChild(li);
+                });
+            }
+
+            uploadPdfBtn.addEventListener('click', () => {
+                const file = pdfUploadInput.files[0];
+                if (file && file.type === 'application/pdf') {
+                    if (file.size > 5 * 1024 * 1024) {
+                        alert('Warning: This PDF is very large. Storing large files in local storage may cause performance issues or exceed limits. For persistent storage, a backend server is recommended.');
+                    }
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const base64Pdf = e.target.result;
+                        pdfs.push({ name: file.name, data: base64Pdf });
+                        localStorage.setItem('pdfs', JSON.stringify(pdfs));
+                        renderPdfs();
+                        pdfUploadInput.value = '';
+                        alert('PDF uploaded (to local storage)!');
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    alert('Please select a PDF file.');
+                }
+            });
+
+            pdfList.addEventListener('click', (event) => {
+                if (event.target.classList.contains('view-pdf-btn') || event.target.closest('.view-pdf-btn')) {
+                    const index = event.target.dataset.index || event.target.closest('.view-pdf-btn').dataset.index;
+                    const pdfData = pdfs[index].data;
+                    const newWindow = window.open();
+                    newWindow.document.write(`<iframe src="${pdfData}" style="width:100%; height:100vh;" frameborder="0"></iframe>`);
+                    newWindow.document.close();
+                } else if (event.target.classList.contains('delete-pdf-btn') || event.target.closest('.delete-pdf-btn')) {
+                    const index = event.target.dataset.index || event.target.closest('.delete-pdf-btn').dataset.index;
+                    if (confirm(`Are you sure you want to delete "${pdfs[index].name}"?`)) {
+                        pdfs.splice(index, 1);
+                        localStorage.setItem('pdfs', JSON.stringify(pdfs));
+                        renderPdfs();
+                        alert('PDF deleted.');
+                    }
+                }
+            });
+
+            renderPdfs();
+
+
+            // --- To-Do List Functionality (Updated for Courses) ---
+            const todoInput = document.getElementById('todoInput');
+            const addTodoItemBtn = document.getElementById('addTodoItemBtn');
+            const todoList = document.getElementById('todoList');
+            let todos = JSON.parse(localStorage.getItem('todos')) || [];
+
+            function renderTodos() {
+                todoList.innerHTML = '';
+                if (todos.length === 0) {
+                    todoList.innerHTML = '<p class="placeholder-text">No to-do items yet.</p>';
+                    return;
+                }
+                todos.forEach((todo, index) => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `
+                        <span>${todo.task}</span>
+                        ${todo.course ? `<span class="course-tag">${todo.course}</span>` : ''}
+                        <div class="actions">
+                            <button class="delete-todo-btn action-btn small-btn delete-btn" data-index="${index}"><i class="fas fa-trash"></i></button>
+                        </div>
+                    `;
+                    todoList.appendChild(li);
+                });
+            }
+
+            addTodoItemBtn.addEventListener('click', () => {
+                const todoText = todoInput.value.trim();
+                if (todoText) {
+                    const course = prompt("Enter the course for this to-do (optional):");
+                    todos.push({ task: todoText, course: course ? course.trim() : null });
+                    localStorage.setItem('todos', JSON.stringify(todos));
+                    renderTodos();
+                    todoInput.value = '';
+                }
+            });
+
+            todoList.addEventListener('click', (event) => {
+                if (event.target.classList.contains('delete-todo-btn') || event.target.closest('.delete-todo-btn')) {
+                    const index = event.target.dataset.index || event.target.closest('.delete-todo-btn').dataset.index;
+                    if (confirm("Are you sure you want to delete this to-do item?")) {
+                        todos.splice(index, 1);
+                        localStorage.setItem('todos', JSON.stringify(todos));
+                        renderTodos();
+                    }
+                }
+            });
+
+            renderTodos();
+
+
+            // --- Timetable Functionality ---
+            const timetableTableBody = document.querySelector('.timetable-table tbody');
+            const saveTimetableBtn = document.getElementById('saveTimetableBtn');
+
+            function createTimeTable() {
+                const times = ["9:00 AM", "10:00 AM", "11:00 AM", "12:00 PM", "1:00 PM", "2:00 PM", "3:00 PM", "4:00 PM", "5:00 PM"];
+                const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
+
+                times.forEach(time => {
+                    const row = document.createElement('tr');
+                    const timeCell = document.createElement('td');
+                    timeCell.textContent = time;
+                    timeCell.contentEditable = "true";
+                    row.appendChild(timeCell);
+
+                    days.forEach(day => {
+                        const cell = document.createElement('td');
+                        cell.contentEditable = true;
+                        cell.dataset.day = day;
+                        cell.dataset.time = time;
+                        row.appendChild(cell);
+                    });
+                    timetableTableBody.appendChild(row);
+                });
+            }
+
+            function loadTimetable() {
+                const savedTimetable = JSON.parse(localStorage.getItem('timetable'));
+                if (savedTimetable) {
+                    timetableTableBody.innerHTML = ''; // Clear table
+                    savedTimetable.forEach(row => {
+                        const tr = document.createElement('tr');
+                        row.forEach(cellData => {
+                            const td = document.createElement('td');
+                            td.textContent = cellData.content;
+                            td.contentEditable = true;
+                            td.dataset.day = cellData.day;
+                            td.dataset.time = cellData.time;
+                            tr.appendChild(td);
+                        });
+                        timetableTableBody.appendChild(tr);
+                    });
+                } else {
+                    createTimeTable();
+                }
+            }
+
+            saveTimetableBtn.addEventListener('click', () => {
+                const timetableData = [];
+                const rows = document.querySelectorAll('.timetable-table tbody tr');
+                rows.forEach(row => {
+                    const rowData = [];
+                    const cells = row.querySelectorAll('td');
+                    cells.forEach(cell => {
+                        rowData.push({
+                            content: cell.textContent,
+                            day: cell.dataset.day,
+                            time: cell.dataset.time
+                        });
+                    });
+                    timetableData.push(rowData);
+                });
+                localStorage.setItem('timetable', JSON.stringify(timetableData));
+                alert('Timetable saved!');
+            });
+
+            loadTimetable();
+
+
+            // --- Homework Section (Updated for Courses and Notifications) ---
+            const homeworkInput = document.getElementById('homeworkInput');
+            const homeworkDueDateInput = document.getElementById('homeworkDueDate');
+            const addHomeworkItemBtn = document.getElementById('addHomeworkItemBtn');
+            const homeworkList = document.getElementById('homeworkList');
+
+            let homeworks = JSON.parse(localStorage.getItem('homeworks')) || [];
+
+            function renderHomeworks() {
+                homeworkList.innerHTML = '';
+                if (homeworks.length === 0) {
+                    homeworkList.innerHTML = '<p class="placeholder-text">No homework assigned yet.</p>';
+                    return;
+                }
+                homeworks.forEach((hw, index) => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `
+                        <span>${hw.task} (Due: ${hw.dueDate})</span>
+                        ${hw.course ? `<span class="course-tag">${hw.course}</span>` : ''}
+                        <div class="actions">
+                            <button class="delete-homework-btn action-btn small-btn delete-btn" data-index="${index}"><i class="fas fa-trash"></i></button>
+                        </div>
+                    `;
+                    homeworkList.appendChild(li);
+                });
+            }
+
+            function requestNotificationPermission() {
+                if (!("Notification" in window)) {
+                    alert("This browser does not support desktop notification.");
+                } else if (Notification.permission !== "denied") {
+                    Notification.requestPermission();
+                }
+            }
+
+            function scheduleNotification(task, date) {
+                if (Notification.permission === "granted") {
+                    const dueDate = new Date(date + "T09:00:00"); // Set time to 9 AM for the reminder
+                    const now = new Date();
+                    const timeDifference = dueDate.getTime() - now.getTime();
+
+                    if (timeDifference > 0) {
+                        setTimeout(() => {
+                            new Notification("Homework Reminder", {
+                                body: `Your homework for "${task}" is due today!`,
+                            });
+                        }, timeDifference);
+                    }
+                }
+            }
+
+            addHomeworkItemBtn.addEventListener('click', () => {
+                const task = homeworkInput.value.trim();
+                const dueDate = homeworkDueDateInput.value;
+                if (task && dueDate) {
+                    const course = prompt("Enter the course for this homework (optional):");
+                    homeworks.push({ task, dueDate, course: course ? course.trim() : null });
+                    localStorage.setItem('homeworks', JSON.stringify(homeworks));
+                    renderHomeworks();
+                    requestNotificationPermission();
+                    scheduleNotification(task, dueDate);
+                    homeworkInput.value = '';
+                    homeworkDueDateInput.value = '';
+                } else {
+                    alert("Please enter both a task and a due date.");
+                }
+            });
+
+            homeworkList.addEventListener('click', (event) => {
+                if (event.target.classList.contains('delete-homework-btn') || event.target.closest('.delete-homework-btn')) {
+                    const index = event.target.dataset.index || event.target.closest('.delete-homework-btn').dataset.index;
+                    if (confirm("Are you sure you want to delete this homework item?")) {
+                        homeworks.splice(index, 1);
+                        localStorage.setItem('homeworks', JSON.stringify(homeworks));
+                        renderHomeworks();
+                    }
+                }
+            });
+
+            renderHomeworks();
+
+
+            // --- Links Section ---
+            const linkNameInput = document.getElementById('linkNameInput');
+            const linkUrlInput = document.getElementById('linkUrlInput');
+            const addLinkItemBtn = document.getElementById('addLinkItemBtn');
+            const linksList = document.getElementById('linksList');
+
+            let links = JSON.parse(localStorage.getItem('links')) || [];
+
+            function renderLinks() {
+                linksList.innerHTML = '';
+                if (links.length === 0) {
+                    linksList.innerHTML = '<p class="placeholder-text">No links saved yet.</p>';
+                    return;
+                }
+                links.forEach((link, index) => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `
+                        <a href="${link.url}" target="_blank">${link.name}</a>
+                        <div class="actions">
+                            <button class="delete-link-btn action-btn small-btn delete-btn" data-index="${index}"><i class="fas fa-trash"></i></button>
+                        </div>
+                    `;
+                    linksList.appendChild(li);
+                });
+            }
+
+            addLinkItemBtn.addEventListener('click', () => {
+                const name = linkNameInput.value.trim();
+                const url = linkUrlInput.value.trim();
+                if (name && url) {
+                    links.push({ name, url });
+                    localStorage.setItem('links', JSON.stringify(links));
+                    renderLinks();
+                    linkNameInput.value = '';
+                    linkUrlInput.value = '';
+                } else {
+                    alert("Please enter both a name and a URL.");
+                }
+            });
+
+            linksList.addEventListener('click', (event) => {
+                if (event.target.classList.contains('delete-link-btn') || event.target.closest('.delete-link-btn')) {
+                    const index = event.target.dataset.index || event.target.closest('.delete-link-btn').dataset.index;
+                    if (confirm("Are you sure you want to delete this link?")) {
+                        links.splice(index, 1);
+                        localStorage.setItem('links', JSON.stringify(links));
+                        renderLinks();
+                    }
+                }
+            });
+
+            renderLinks();
+
+
+            // --- Pomodoro Timer Functionality ---
+            const pomodoroTimerDisplay = document.getElementById('pomodoroTimerDisplay');
+            const pomodoroStatus = document.getElementById('pomodoroStatus');
+            const startTimerBtn = document.getElementById('startTimerBtn');
+            const pauseTimerBtn = document.getElementById('pauseTimerBtn');
+            const resetTimerBtn = document.getElementById('resetTimerBtn');
+            const workTimeInput = document.getElementById('workTime');
+            const breakTimeInput = document.getElementById('breakTime');
+
+            let countdown;
+            let isWorking = true;
+            let isPaused = false;
+            let timeLeft;
+
+            function startTimer() {
+                if (isPaused) {
+                    isPaused = false;
+                    countdown = setInterval(updateTimer, 1000);
+                    startTimerBtn.textContent = 'Continue';
+                    startTimerBtn.classList.add('hidden');
+                    pauseTimerBtn.classList.remove('hidden');
+                    return;
+                }
+
+                const workDuration = parseInt(workTimeInput.value) * 60;
+                const breakDuration = parseInt(breakTimeInput.value) * 60;
+
+                timeLeft = isWorking ? workDuration : breakDuration;
+
+                clearInterval(countdown);
+                countdown = setInterval(updateTimer, 1000);
+
+                startTimerBtn.classList.add('hidden');
+                pauseTimerBtn.classList.remove('hidden');
+            }
+
+            function updateTimer() {
+                timeLeft--;
+                if (timeLeft < 0) {
+                    clearInterval(countdown);
+                    isWorking = !isWorking;
+                    pomodoroStatus.textContent = isWorking ? 'Work Session' : 'Break Session';
+                    alert(`Time's up! Starting your ${isWorking ? 'work' : 'break'} session now.`);
+                    startTimer();
+                } else {
+                    const minutes = Math.floor(timeLeft / 60);
+                    const seconds = timeLeft % 60;
+                    pomodoroTimerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                }
+            }
+
+            function pauseTimer() {
+                isPaused = true;
+                clearInterval(countdown);
+                startTimerBtn.textContent = 'Continue';
+                startTimerBtn.classList.remove('hidden');
+                pauseTimerBtn.classList.add('hidden');
+            }
+
+            function resetTimer() {
+                clearInterval(countdown);
+                isWorking = true;
+                isPaused = false;
+                timeLeft = parseInt(workTimeInput.value) * 60;
+                pomodoroTimerDisplay.textContent = `${workTimeInput.value.padStart(2, '0')}:00`;
+                pomodoroStatus.textContent = 'Work Session';
+                startTimerBtn.textContent = 'Start';
+                startTimerBtn.classList.remove('hidden');
+                pauseTimerBtn.classList.add('hidden');
+            }
+
+            startTimerBtn.addEventListener('click', startTimer);
+            pauseTimerBtn.addEventListener('click', pauseTimer);
+            resetTimerBtn.addEventListener('click', resetTimer);
+
+
+            // --- Backup & Restore Functionality (Updated for Single Note Export) ---
+            const exportDataBtn = document.getElementById('exportDataBtn');
+            const importFileInput = document.getElementById('importFileInput');
+            const importDataBtn = document.getElementById('importDataBtn');
+
+            exportDataBtn.addEventListener('click', () => {
+                const choice = prompt("What would you like to export? Type 'all' for all data or 'note' for a specific note.");
+
+                if (choice && choice.toLowerCase() === 'note') {
+                    const notes = JSON.parse(localStorage.getItem('allNotes')) || [];
+                    if (notes.length === 0) {
+                        alert("You don't have any notes to export.");
+                        return;
+                    }
+
+                    const noteTitles = notes.map(note => note.title).join('\n- ');
+                    const noteTitleToExport = prompt(`Enter the title of the note you want to export:\n\nNotes available:\n- ${noteTitles}`);
+
+                    if (noteTitleToExport) {
+                        const noteToExport = notes.find(note => note.title === noteTitleToExport.trim());
+                        if (noteToExport) {
+                            const dataStr = JSON.stringify({ singleNote: noteToExport }, null, 2);
+                            const blob = new Blob([dataStr], { type: 'application/json' });
+                            const url = URL.createObjectURL(blob);
+                            const a = document.createElement('a');
+                            a.href = url;
+                            a.download = `${noteToExport.title}-note-backup.json`;
+                            document.body.appendChild(a);
+                            a.click();
+                            document.body.removeChild(a);
+                            URL.revokeObjectURL(url);
+                            alert(`Note "${noteToExport.title}" exported successfully!`);
+                        } else {
+                            alert("Note not found. Please check the title and try again.");
+                        }
+                    }
+                } else {
+                    const allData = {
+                        allNotes: JSON.parse(localStorage.getItem('allNotes')) || [],
+                        todos: JSON.parse(localStorage.getItem('todos')) || [],
+                        timetable: JSON.parse(localStorage.getItem('timetable')) || [],
+                        homeworks: JSON.parse(localStorage.getItem('homeworks')) || [],
+                        links: JSON.parse(localStorage.getItem('links')) || [],
+                        pdfs: JSON.parse(localStorage.getItem('pdfs')) || [],
+                    };
+                    const dataStr = JSON.stringify(allData, null, 2);
+                    const blob = new Blob([dataStr], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'study-hub-backup.json';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                    alert('All data exported successfully!');
+                }
+            });
+
+            importDataBtn.addEventListener('click', () => {
+                const file = importFileInput.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        try {
+                            const importedData = JSON.parse(e.target.result);
+                            if (confirm("Are you sure you want to import this data? This will overwrite your current data!")) {
+                                if (importedData.singleNote) {
+                                    const note = importedData.singleNote;
+                                    let notes = JSON.parse(localStorage.getItem('allNotes')) || [];
+                                    const existingNoteIndex = notes.findIndex(n => n.id === note.id);
+                                    if (existingNoteIndex > -1) {
+                                        if (confirm("A note with the same ID already exists. Do you want to overwrite it?")) {
+                                            notes[existingNoteIndex] = note;
+                                        }
+                                    } else {
+                                        notes.push(note);
+                                    }
+                                    localStorage.setItem('allNotes', JSON.stringify(notes));
+                                    reloadAllData();
+                                    alert('Single note imported successfully!');
+                                } else {
+                                    localStorage.setItem('allNotes', JSON.stringify(importedData.allNotes || []));
+                                    localStorage.setItem('todos', JSON.stringify(importedData.todos || []));
+                                    localStorage.setItem('timetable', JSON.stringify(importedData.timetable || []));
+                                    localStorage.setItem('homeworks', JSON.stringify(importedData.homeworks || []));
+                                    localStorage.setItem('links', JSON.stringify(importedData.links || []));
+                                    localStorage.setItem('pdfs', JSON.stringify(importedData.pdfs || []));
+                                    reloadAllData();
+                                    alert('All data imported successfully!');
+                                }
+                            }
+                        } catch (error) {
+                            alert('Failed to parse JSON file. Please make sure the file is a valid backup file.');
+                        }
+                    };
+                    reader.readAsText(file);
+                } else {
+                    alert('Please select a JSON file to import.');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

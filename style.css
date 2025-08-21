@@ -1,0 +1,591 @@
+/*
+ * Google Fonts: Poppins
+ * A modern, geometric sans-serif font
+ */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+
+/* === General Styles & Variables === */
+:root {
+  --primary-color: #4c5b75; /* A sophisticated dark blue-gray */
+  --secondary-color: #34c38f; /* A vibrant green for highlights */
+  --accent-color: #e65252; /* A soft red for danger actions */
+  --text-color: #343a40;
+  --text-light-color: #c0c7d1;
+  --bg-color: #f0f2f5; /* A very light, clean background */
+  --card-bg-color: #ffffff;
+  --sidebar-bg-color: #ffffff;
+  --border-color: #e9ecef;
+  --shadow-light: 0 4px 12px rgba(0, 0, 0, 0.05);
+  --shadow-hover: 0 6px 18px rgba(0, 0, 0, 0.1);
+}
+
+/* Dark mode variables */
+.dark-mode {
+  --primary-color: #34c38f;
+  --secondary-color: #4c5b75;
+  --accent-color: #ff7272;
+  --text-color: #c0c7d1;
+  --text-light-color: #e9ecef;
+  --bg-color: #2a3042;
+  --card-bg-color: #232837;
+  --sidebar-bg-color: #232837;
+  --border-color: #3e4453;
+}
+
+body {
+  font-family: 'Poppins', sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  margin: 0;
+  padding: 0;
+  line-height: 1.6;
+  transition: background-color 0.4s, color 0.4s;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  min-height: 100vh;
+  padding: 1rem;
+}
+
+/* === Header === */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  background-color: var(--card-bg-color);
+  box-shadow: var(--shadow-light);
+  border-radius: 12px;
+  margin-bottom: 2rem;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.app-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--primary-color);
+  margin: 0;
+}
+
+.icon-button {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--text-color);
+  transition: color 0.2s, transform 0.2s;
+}
+
+.icon-button:hover {
+  color: var(--secondary-color);
+  transform: scale(1.1);
+}
+
+.menu-toggle-btn {
+  display: none; /* Hide on larger screens */
+}
+
+/* === Main Layout (Sidebar + Content) === */
+.main-layout {
+  display: flex;
+  gap: 1.5rem;
+}
+
+/* === Sidebar Navigation === */
+.sidebar {
+  width: 250px;
+  background-color: var(--sidebar-bg-color);
+  padding: 1.5rem 1rem;
+  border-radius: 12px;
+  box-shadow: var(--shadow-light);
+  flex-shrink: 0;
+  transition: transform 0.3s ease-in-out;
+}
+
+.nav-button {
+  background: none;
+  border: none;
+  color: var(--text-color);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  width: 100%;
+  text-align: left;
+  border-radius: 8px;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.nav-button i {
+  font-size: 1.25rem;
+}
+
+.nav-button.active {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.nav-button.active i {
+  color: white;
+}
+
+.nav-button:hover {
+  background-color: var(--border-color);
+}
+
+.dark-mode .nav-button:hover {
+  background-color: #3e4453;
+}
+
+
+/* === Main Content & Sections === */
+main.content {
+  flex-grow: 1;
+  background-color: var(--card-bg-color);
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: var(--shadow-light);
+}
+
+.section {
+  display: none;
+}
+
+.section.active {
+  display: block;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  border-bottom: 2px solid var(--border-color);
+  padding-bottom: 1rem;
+}
+
+.section-header h2 {
+  font-size: 1.6rem;
+  font-weight: 600;
+  margin: 0;
+  color: var(--primary-color);
+}
+
+/* === Buttons & Inputs === */
+.action-btn, .add-new-btn {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.action-btn:hover, .add-new-btn:hover {
+  background-color: var(--secondary-color);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.save-btn {
+  background-color: var(--secondary-color);
+}
+
+.save-btn:hover {
+  background-color: #30a576;
+}
+
+.delete-btn {
+  background-color: var(--accent-color);
+  padding: 0.5rem 0.8rem;
+  font-size: 0.9rem;
+}
+
+.delete-btn:hover {
+  background-color: #e05e5e;
+}
+
+.text-input, input[type="file"] {
+  border: 1px solid var(--border-color);
+  padding: 0.75rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  color: var(--text-color);
+  background-color: var(--bg-color);
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.dark-mode .text-input {
+    background-color: var(--card-bg-color);
+}
+
+.text-input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(85, 110, 230, 0.2);
+}
+
+/* === Lists and Cards === */
+.styled-list {
+  list-style: none;
+  padding: 0;
+}
+
+/* This rule is for all general lists (To-Do, Homework, Links) */
+.styled-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  margin-bottom: 0.75rem;
+  background-color: var(--bg-color);
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s, box-shadow 0.2s;
+  position: relative;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+/* This rule specifically targets the notes list and removes the box styling */
+.notes-list li {
+  background-color: transparent;
+  box-shadow: none;
+  border-radius: 0;
+  padding: 0.5rem 0;
+  margin-bottom: 0;
+  display: block;
+  border-left: 4px solid transparent;
+  transition: border-left 0.2s;
+}
+
+/* New style for the active note to make it look like a selected menu item */
+.notes-list .note-item.active-note {
+  background-color: transparent;
+  box-shadow: none;
+  transform: none;
+  border-left: 4px solid var(--secondary-color);
+  color: var(--secondary-color);
+  padding-left: calc(0.5rem - 4px); /* Corrects padding for border */
+}
+
+/* Styles for note actions inside the list */
+.note-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.note-item .note-title {
+  font-weight: 600;
+  color: var(--text-color);
+  flex-grow: 1;
+}
+
+.notes-list .note-item.active-note .note-title {
+  color: var(--secondary-color);
+}
+
+.note-item.active-note .note-actions .icon-button {
+  color: var(--secondary-color);
+}
+
+.note-actions {
+  display: flex;
+  gap: 5px;
+}
+
+.note-actions button {
+  background: none;
+  border: none;
+  color: var(--text-color);
+  font-size: 1rem;
+  cursor: pointer;
+  margin-left: 0.5rem;
+  transition: color 0.2s;
+}
+
+.note-actions button.delete-btn {
+  color: var(--accent-color);
+}
+
+/* === Notes Editor Styling === */
+#editor {
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  /* Reduced minimum height */
+  min-height: 200px;
+  background-color: var(--card-bg-color);
+  color: var(--text-color);
+  margin-top: 1rem;
+}
+
+/* Set height to auto to allow the editor to grow with content */
+#editor .ql-editor {
+  min-height: 200px;
+  height: auto;
+  overflow-y: hidden;
+  font-family: 'Poppins', sans-serif;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--text-color);
+}
+
+.note-actions button.delete-btn {
+  color: var(--accent-color);
+}
+
+/* Course Tag */
+.course-tag {
+  background-color: var(--primary-color);
+  color: white;
+  padding: 0.2rem 0.6rem;
+  font-size: 0.75rem;
+  border-radius: 4px;
+  font-weight: 600;
+  margin-left: 1rem;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+
+.note-item.active-note .course-tag {
+    background-color: white;
+    color: var(--primary-color);
+}
+
+
+/* === Timetable === */
+.timetable-grid {
+  overflow-x: auto;
+}
+
+.timetable-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+
+.timetable-table th, .timetable-table td {
+  border: 1px solid var(--border-color);
+  padding: 0.75rem;
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+.timetable-table th {
+  background-color: var(--primary-color);
+  color: white;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.timetable-table td[contenteditable="true"]:focus {
+  outline: 2px solid var(--secondary-color);
+  background-color: var(--bg-color);
+}
+
+/* === Calculator Modal === */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 2000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(5px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background-color: var(--card-bg-color);
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: var(--shadow-light);
+  max-width: 400px;
+  width: 90%;
+  position: relative;
+}
+
+.calculator-content h3 {
+  text-align: center;
+  font-size: 1.5rem;
+  color: var(--primary-color);
+  margin-top: 0;
+}
+
+.calculator-display {
+  width: calc(100% - 1.5rem);
+  height: 60px;
+  font-size: 2rem;
+  text-align: right;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  padding: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.calculator-buttons {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+.calculator-buttons .btn {
+  height: 60px;
+  font-size: 1.25rem;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  transition: background-color 0.2s, transform 0.2s;
+}
+
+.calculator-buttons .btn:active {
+  transform: scale(0.95);
+}
+
+.calculator-buttons .number:hover { background-color: #eef1f4; }
+.calculator-buttons .operator:hover, .calculator-buttons .equals:hover, .calculator-buttons .clear:hover, .calculator-buttons .backspace:hover { background-color: var(--secondary-color); color: white; }
+
+.calculator-buttons .equals {
+  grid-column: span 2;
+  background-color: var(--secondary-color);
+  color: white;
+}
+
+.calculator-buttons .zero {
+  grid-column: span 2;
+}
+
+/* === Pomodoro Timer Styles === */
+.timer-display-container {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.timer-display {
+    font-size: 4rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.timer-status {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-color);
+    margin-top: 0.5rem;
+}
+
+.timer-controls {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.timer-controls button {
+    padding: 1rem 2rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.start-btn { background-color: var(--secondary-color); }
+.pause-btn { background-color: var(--accent-color); }
+.reset-btn { background-color: var(--border-color); color: var(--text-color); }
+
+.timer-settings {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+}
+
+.timer-settings .input-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.timer-settings .time-input {
+    width: 80px;
+    text-align: center;
+}
+
+/* === Utility Classes === */
+.mt-15 { margin-top: 15px; }
+.mt-20 { margin-top: 20px; }
+.mt-30 { margin-top: 30px; }
+.small-text { font-size: 0.8rem; color: #888; }
+.small-btn { padding: 0.5rem; font-size: 0.9rem; }
+.placeholder-text { text-align: center; font-style: italic; color: #aaa; }
+.hidden { display: none; }
+
+/* === Responsive Design for Mobile === */
+@media (max-width: 768px) {
+    body {
+        padding-bottom: 4rem; /* Add space for the bottom nav */
+    }
+
+    .main-layout {
+        flex-direction: column;
+        gap: 0;
+    }
+
+    .header .header-left {
+      gap: 0.5rem;
+    }
+
+    .app-title {
+        font-size: 1.5rem;
+        flex-grow: 1;
+        text-align: center;
+    }
+    
+    .menu-toggle-btn {
+      display: block; /* Show menu toggle button on mobile */
+    }
+
+    .sidebar {
+        position: fixed;
+        left: 0;
+        top: 0;
+        height: 100vh;
+        width: 250px;
+        padding-top: 4rem;
+        z-index: 1001;
+        transform: translateX(-100%);
+        transition: transform 0.3s ease-in-out;
+    }
+
+    .sidebar.active {
+        transform: translateX(0);
+    }
+
+    main.content {
+        padding: 1rem;
+    }
+}
