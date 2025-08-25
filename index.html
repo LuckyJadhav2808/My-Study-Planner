@@ -13,6 +13,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- <CHANGE> Added jsPDF library for PDF generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
     <div class="container" data-theme="light">
@@ -53,6 +55,11 @@
                     <i class="fas fa-clock"></i>
                     <span>Pomodoro</span>
                 </button>
+                <!-- <CHANGE> Added PDF Viewer navigation button -->
+                <button class="nav-button" data-target="pdfViewerSection">
+                    <i class="fas fa-file-pdf"></i>
+                    <span>PDF Viewer</span>
+                </button>
                 <button class="nav-button" data-target="backupRestoreSection">
                     <i class="fas fa-cloud-arrow-up"></i>
                     <span>Backup</span>
@@ -72,15 +79,55 @@
                         </ul>
                         <h3 class="mt-30">Current Note: <span id="currentNoteTitleDisplay">Not Loaded</span></h3>
                         <div id="editor"></div>
-                        <button id="saveCurrentNoteBtn" class="action-btn save-btn mt-15"><i class="fas fa-save"></i> Save Note</button>
+                        <div class="note-actions-bar mt-15">
+                            <button id="saveCurrentNoteBtn" class="action-btn save-btn"><i class="fas fa-save"></i> Save Note</button>
+                            <!-- <CHANGE> Added download PDF button for current note -->
+                            <button id="downloadNotePdfBtn" class="action-btn"><i class="fas fa-download"></i> Download as PDF</button>
+                        </div>
                         <p class="small-text">Notes are saved in your browser's local storage.</p>
                         <h3 class="mt-30">PDF Notes (Local Storage - Limited Capacity)</h3>
                         <div class="pdf-upload-area">
                             <p>Upload your PDF notes here:</p>
-                            <input type="file" id="pdfUploadInput" accept=".pdf">
-                            <button id="uploadPdfBtn" class="action-btn"><i class="fas fa-upload"></i> Upload PDF</button>
+                            <!-- <CHANGE> Added subject selection for PDF upload -->
+                            <div class="pdf-upload-controls">
+                                <select id="pdfSubjectSelect" class="text-input">
+                                    <option value="">Select Subject</option>
+                                    <option value="Mathematics">Mathematics</option>
+                                    <option value="Physics">Physics</option>
+                                    <option value="Chemistry">Chemistry</option>
+                                    <option value="Biology">Biology</option>
+                                    <option value="Computer Science">Computer Science</option>
+                                    <option value="English">English</option>
+                                    <option value="History">History</option>
+                                    <option value="Geography">Geography</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                                <input type="text" id="customSubjectInput" placeholder="Enter custom subject" class="text-input" style="display: none;">
+                                <input type="file" id="pdfUploadInput" accept=".pdf">
+                                <button id="uploadPdfBtn" class="action-btn"><i class="fas fa-upload"></i> Upload PDF</button>
+                            </div>
                             <p class="small-text">Warning: Storing large PDFs in local storage is not recommended.</p>
                             <div id="pdfList" class="pdf-list"></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- <CHANGE> Added new PDF Viewer section -->
+                <section id="pdfViewerSection" class="section">
+                    <div class="section-header">
+                        <h2>📄 PDF Viewer</h2>
+                        <div class="pdf-viewer-controls">
+                            <select id="subjectFilterSelect" class="text-input">
+                                <option value="">All Subjects</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="pdf-viewer-container">
+                        <div id="pdfSubjectCategories" class="pdf-categories">
+                            <p class="placeholder-text">No PDFs uploaded yet. Upload PDFs from the Notes section to view them here!</p>
+                        </div>
+                        <div id="pdfViewerDisplay" class="pdf-viewer-display">
+                            <p class="placeholder-text">Select a PDF to view it here</p>
                         </div>
                     </div>
                 </section>
@@ -267,9 +314,10 @@
                 renderHomeworks();
                 renderLinks();
                 loadDarkModePreference();
+                // <CHANGE> Added PDF viewer rendering to reload function
+                renderPdfViewer();
                 alert('All data reloaded!');
             }
-
 
             // --- Dark Mode Functionality ---
             function loadDarkModePreference() {
@@ -302,18 +350,16 @@
                 navButtons.forEach(button => {
                     button.classList.remove('active');
                 });
-                document.querySelector(`.nav-button[data-target="${targetId}"]`).classList.add('active');
-                
+                document.querySelector(`[data-target="${targetId}"]`).classList.add('active');
+
                 if (window.innerWidth <= 768) {
                     sidebar.classList.remove('active');
                 }
             }
 
-            showSection('notesSection');
-
             navButtons.forEach(button => {
                 button.addEventListener('click', () => {
-                    const targetId = button.dataset.target;
+                    const targetId = button.getAttribute('data-target');
                     showSection(targetId);
                 });
             });
@@ -322,10 +368,7 @@
                 sidebar.classList.toggle('active');
             });
 
-
             // --- Calculator Functionality ---
-            calculatorModal.style.display = 'none';
-
             calculatorButton.addEventListener('click', () => {
                 calculatorModal.style.display = 'flex';
             });
@@ -335,382 +378,540 @@
             });
 
             window.addEventListener('click', (event) => {
-                if (event.target == calculatorModal) {
+                if (event.target === calculatorModal) {
                     calculatorModal.style.display = 'none';
                 }
             });
 
             const calcDisplay = document.getElementById('calcDisplay');
-            const calcButtons = document.querySelector('.calculator-buttons');
+            const calcButtons = document.querySelectorAll('.calculator-buttons .btn');
             let currentInput = '0';
             let operator = null;
-            let firstOperand = null;
-            let waitingForSecondOperand = false;
+            let previousInput = null;
+            let waitingForOperand = false;
 
             function updateDisplay() {
                 calcDisplay.value = currentInput;
             }
 
-            function inputDigit(digit) {
-                if (waitingForSecondOperand) {
-                    currentInput = digit;
-                    waitingForSecondOperand = false;
+            function inputNumber(num) {
+                if (waitingForOperand) {
+                    currentInput = num;
+                    waitingForOperand = false;
                 } else {
-                    currentInput = currentInput === '0' ? digit : currentInput + digit;
+                    currentInput = currentInput === '0' ? num : currentInput + num;
                 }
                 updateDisplay();
             }
 
-            function inputDecimal(dot) {
-                if (waitingForSecondOperand) {
-                    currentInput = '0.';
-                    waitingForSecondOperand = false;
-                } else if (!currentInput.includes(dot)) {
-                    currentInput += dot;
-                }
-                updateDisplay();
-            }
-
-            function handleOperator(nextOperator) {
+            function inputOperator(nextOperator) {
                 const inputValue = parseFloat(currentInput);
 
-                if (operator && waitingForSecondOperand) {
-                    operator = nextOperator;
-                    return;
-                }
-
-                if (firstOperand === null) {
-                    firstOperand = inputValue;
+                if (previousInput === null) {
+                    previousInput = inputValue;
                 } else if (operator) {
-                    const result = operate(firstOperand, inputValue, operator);
-                    currentInput = String(result);
-                    firstOperand = result;
+                    const currentValue = previousInput || 0;
+                    const newValue = calculate(currentValue, inputValue, operator);
+
+                    currentInput = String(newValue);
+                    previousInput = newValue;
+                    updateDisplay();
                 }
 
-                waitingForSecondOperand = true;
+                waitingForOperand = true;
                 operator = nextOperator;
-                updateDisplay();
             }
 
-            function operate(num1, num2, op) {
-                if (op === '+') return num1 + num2;
-                if (op === '-') return num1 - num2;
-                if (op === '*') return num1 * num2;
-                if (op === '/') {
-                    if (num2 === 0) {
-                        alert("Cannot divide by zero!");
-                        return 'Error';
-                    }
-                    return num1 / num2;
+            function calculate(firstOperand, secondOperand, operator) {
+                switch (operator) {
+                    case '+': return firstOperand + secondOperand;
+                    case '-': return firstOperand - secondOperand;
+                    case '*': return firstOperand * secondOperand;
+                    case '/': return firstOperand / secondOperand;
+                    case '%': return firstOperand % secondOperand;
+                    default: return secondOperand;
                 }
-                if (op === '%') return (num1 / 100) * num2;
-                return num2;
             }
 
-            function resetCalculator() {
-                currentInput = '0';
-                operator = null;
-                firstOperand = null;
-                waitingForSecondOperand = false;
-                updateDisplay();
-            }
+            calcButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const action = button.getAttribute('data-action');
+                    const value = button.getAttribute('data-value');
 
-            function backspace() {
-                currentInput = currentInput.slice(0, -1);
-                if (currentInput === '' || currentInput === '-') {
-                    currentInput = '0';
-                }
-                updateDisplay();
-            }
-
-            calcButtons.addEventListener('click', (event) => {
-                const { target } = event;
-                if (!target.matches('button')) {
-                    return;
-                }
-
-                if (target.classList.contains('number')) {
-                    inputDigit(target.dataset.value);
-                    return;
-                }
-
-                if (target.dataset.value === '.') {
-                    inputDecimal(target.dataset.value);
-                    return;
-                }
-
-                if (target.classList.contains('operator')) {
-                    handleOperator(target.dataset.value);
-                    return;
-                }
-
-                if (target.dataset.action === 'equals') {
-                    if (operator && firstOperand !== null) {
-                        const result = operate(firstOperand, parseFloat(currentInput), operator);
-                        currentInput = String(result);
-                        firstOperand = null;
+                    if (button.classList.contains('number')) {
+                        inputNumber(value);
+                    } else if (button.classList.contains('operator')) {
+                        inputOperator(value);
+                    } else if (action === 'equals') {
+                        if (operator && previousInput !== null && !waitingForOperand) {
+                            const inputValue = parseFloat(currentInput);
+                            const newValue = calculate(previousInput, inputValue, operator);
+                            currentInput = String(newValue);
+                            previousInput = null;
+                            operator = null;
+                            waitingForOperand = true;
+                            updateDisplay();
+                        }
+                    } else if (action === 'clear') {
+                        currentInput = '0';
+                        previousInput = null;
                         operator = null;
-                        waitingForSecondOperand = false;
+                        waitingForOperand = false;
+                        updateDisplay();
+                    } else if (action === 'backspace') {
+                        if (currentInput.length > 1) {
+                            currentInput = currentInput.slice(0, -1);
+                        } else {
+                            currentInput = '0';
+                        }
                         updateDisplay();
                     }
-                    return;
-                }
-
-                if (target.dataset.action === 'clear') {
-                    resetCalculator();
-                    return;
-                }
-
-                if (target.dataset.action === 'backspace') {
-                    backspace();
-                    return;
-                }
+                });
             });
 
-            updateDisplay();
+            // --- Notes Functionality ---
+            let allNotes = JSON.parse(localStorage.getItem('allNotes')) || [];
+            let activeNoteId = localStorage.getItem('activeNoteId');
 
-            // --- Notes Section Functionality (Updated for Courses) ---
+            const notesList = document.getElementById('notesList');
+            const createNewNoteBtn = document.getElementById('createNewNoteBtn');
+            const saveCurrentNoteBtn = document.getElementById('saveCurrentNoteBtn');
+            const currentNoteTitleDisplay = document.getElementById('currentNoteTitleDisplay');
+            // <CHANGE> Added download PDF button reference
+            const downloadNotePdfBtn = document.getElementById('downloadNotePdfBtn');
+
             const editor = new Quill('#editor', {
                 theme: 'snow',
-                placeholder: 'Start writing your notes here...',
                 modules: {
                     toolbar: [
+                        [{ 'header': [1, 2, 3, false] }],
                         ['bold', 'italic', 'underline', 'strike'],
-                        ['blockquote', 'code-block'],
-                        [{ 'header': 1 }, { 'header': 2 }],
-                        [{ 'list': 'ordered' }, { 'list': 'bullet' }],
-                        [{ 'script': 'sub' }, { 'script': 'super' }],
-                        [{ 'indent': '-1' }, { 'indent': '+1' }],
-                        [{ 'direction': 'rtl' }],
-                        [{ 'size': ['small', false, 'large', 'huge'] }],
-                        [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
                         [{ 'color': [] }, { 'background': [] }],
-                        [{ 'font': [] }],
+                        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
                         [{ 'align': [] }],
+                        ['link', 'image'],
                         ['clean']
                     ]
                 }
             });
 
-            const createNewNoteBtn = document.getElementById('createNewNoteBtn');
-            const saveCurrentNoteBtn = document.getElementById('saveCurrentNoteBtn');
-            const notesListElement = document.getElementById('notesList');
-            const currentNoteTitleDisplay = document.getElementById('currentNoteTitleDisplay');
-
-            let allNotes = JSON.parse(localStorage.getItem('allNotes')) || [];
-            let activeNoteId = localStorage.getItem('activeNoteId');
-
             function renderNotesList() {
-                notesListElement.innerHTML = '';
                 if (allNotes.length === 0) {
-                    notesListElement.innerHTML = '<p class="placeholder-text">No notes yet. Click \'New Note\' to create one!</p>';
+                    notesList.innerHTML = '<p class="placeholder-text">No notes yet. Click \'New Note\' to create one!</p>';
                     return;
                 }
 
+                notesList.innerHTML = '';
                 allNotes.forEach(note => {
                     const li = document.createElement('li');
-                    li.className = `note-item ${note.id === activeNoteId ? 'active-note' : ''}`;
-                    li.dataset.noteId = note.id;
+                    li.className = 'note-item';
+                    if (note.id === activeNoteId) {
+                        li.classList.add('active-note');
+                    }
+
                     li.innerHTML = `
                         <span class="note-title">${note.title}</span>
-                        ${note.course ? `<span class="course-tag">${note.course}</span>` : ''}
                         <div class="note-actions">
-                            <button class="load-note-btn action-btn small-btn" data-note-id="${note.id}" title="Load Note"><i class="fas fa-folder-open"></i></button>
-                            <button class="delete-note-btn action-btn small-btn delete-btn" data-note-id="${note.id}" title="Delete Note"><i class="fas fa-trash"></i></button>
+                            <button class="icon-button edit-btn" data-note-id="${note.id}" title="Edit"><i class="fas fa-edit"></i></button>
+                            <button class="icon-button delete-btn" data-note-id="${note.id}" title="Delete"><i class="fas fa-trash"></i></button>
                         </div>
                     `;
-                    notesListElement.appendChild(li);
+
+                    notesList.appendChild(li);
+                });
+
+                document.querySelectorAll('.edit-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const noteId = btn.getAttribute('data-note-id');
+                        loadNoteIntoEditor(noteId);
+                    });
+                });
+
+                document.querySelectorAll('.delete-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const noteId = btn.getAttribute('data-note-id');
+                        deleteNote(noteId);
+                    });
                 });
             }
 
             function loadNoteIntoEditor(noteId) {
-                const noteToLoad = allNotes.find(note => note.id === noteId);
-                if (noteToLoad) {
-                    if (activeNoteId && activeNoteId !== noteId) {
-                        const currentNote = allNotes.find(note => note.id === activeNoteId);
-                        if (currentNote) {
-                            currentNote.content = JSON.stringify(editor.getContents());
-                            localStorage.setItem('allNotes', JSON.stringify(allNotes));
-                        }
+                const note = allNotes.find(n => n.id === noteId);
+                if (note) {
+                    try {
+                        const delta = JSON.parse(note.content);
+                        editor.setContents(delta);
+                    } catch (error) {
+                        editor.setText(note.content || '');
                     }
-                    editor.setContents(JSON.parse(noteToLoad.content));
-                    currentNoteTitleDisplay.textContent = noteToLoad.title;
                     activeNoteId = noteId;
                     localStorage.setItem('activeNoteId', activeNoteId);
+                    currentNoteTitleDisplay.textContent = note.title;
                     renderNotesList();
-                } else {
-                    editor.setContents([{ insert: 'Note not found. Create a new one.' }]);
-                    currentNoteTitleDisplay.textContent = 'Not Loaded';
-                    activeNoteId = null;
-                    localStorage.removeItem('activeNoteId');
+                }
+            }
+
+            function deleteNote(noteId) {
+                if (confirm('Are you sure you want to delete this note?')) {
+                    allNotes = allNotes.filter(note => note.id !== noteId);
+                    localStorage.setItem('allNotes', JSON.stringify(allNotes));
+
+                    if (activeNoteId === noteId) {
+                        if (allNotes.length > 0) {
+                            loadNoteIntoEditor(allNotes[0].id);
+                        } else {
+                            activeNoteId = null;
+                            localStorage.removeItem('activeNoteId');
+                            editor.setContents([{ insert: 'Welcome to your Study Hub Notes! Click "New Note" to create one!' }]);
+                            currentNoteTitleDisplay.textContent = 'Not Loaded';
+                        }
+                    }
+
                     renderNotesList();
                 }
             }
 
             createNewNoteBtn.addEventListener('click', () => {
-                const noteTitle = prompt("Enter a title for your new note:");
-                if (!noteTitle || noteTitle.trim() === "") {
-                    alert("Note title cannot be empty!");
-                    return;
-                }
-                const course = prompt("Enter the course for this note (optional):");
+                const title = prompt('Enter note title:');
+                if (title && title.trim()) {
+                    const newNote = {
+                        id: generateUniqueId(),
+                        title: title.trim(),
+                        content: JSON.stringify([{ insert: '' }]),
+                        createdAt: new Date().toISOString()
+                    };
 
-                if (activeNoteId) {
-                    const currentNote = allNotes.find(note => note.id === activeNoteId);
-                    if (currentNote) {
-                        currentNote.content = JSON.stringify(editor.getContents());
-                        localStorage.setItem('allNotes', JSON.stringify(allNotes));
-                    }
+                    allNotes.push(newNote);
+                    localStorage.setItem('allNotes', JSON.stringify(allNotes));
+                    loadNoteIntoEditor(newNote.id);
+                    renderNotesList();
                 }
-                const newNote = {
-                    id: generateUniqueId(),
-                    title: noteTitle.trim(),
-                    course: course ? course.trim() : null,
-                    content: JSON.stringify([{ insert: 'Start writing your new note here...' }]),
-                    createdAt: new Date().toISOString()
-                };
-                allNotes.push(newNote);
-                localStorage.setItem('allNotes', JSON.stringify(allNotes));
-                loadNoteIntoEditor(newNote.id);
-                alert(`New note "${newNote.title}" created!`);
             });
 
             saveCurrentNoteBtn.addEventListener('click', () => {
                 if (activeNoteId) {
-                    const noteToSave = allNotes.find(note => note.id === activeNoteId);
-                    if (noteToSave) {
-                        noteToSave.content = JSON.stringify(editor.getContents());
+                    const note = allNotes.find(n => n.id === activeNoteId);
+                    if (note) {
+                        note.content = JSON.stringify(editor.getContents());
+                        note.updatedAt = new Date().toISOString();
                         localStorage.setItem('allNotes', JSON.stringify(allNotes));
-                        alert(`Note "${noteToSave.title}" saved!`);
+                        alert('Note saved successfully!');
                     }
                 } else {
-                    alert("No note selected. Create a new note first!");
+                    alert('No active note to save. Please create a new note first.');
                 }
             });
 
-            notesListElement.addEventListener('click', (event) => {
-                const target = event.target;
-                const loadBtn = target.closest('.load-note-btn');
-                const deleteBtn = target.closest('.delete-note-btn');
-
-                if (loadBtn) {
-                    const noteId = loadBtn.dataset.noteId;
-                    loadNoteIntoEditor(noteId);
-                } else if (deleteBtn) {
-                    const noteId = deleteBtn.dataset.noteId;
-                    const noteTitleToDelete = allNotes.find(note => note.id === noteId)?.title || "this note";
-
-                    if (confirm(`Are you sure you want to delete "${noteTitleToDelete}"?`)) {
-                        allNotes = allNotes.filter(note => note.id !== noteId);
-                        localStorage.setItem('allNotes', JSON.stringify(allNotes));
-                        renderNotesList();
-                        if (activeNoteId === noteId) {
-                            editor.setContents([{ insert: 'Note deleted. Create or load another note.' }]);
-                            currentNoteTitleDisplay.textContent = 'Not Loaded';
-                            activeNoteId = null;
-                            localStorage.removeItem('activeNoteId');
-                        }
-                        alert('Note deleted.');
+            // <CHANGE> Added PDF download functionality for notes
+            downloadNotePdfBtn.addEventListener('click', () => {
+                if (activeNoteId) {
+                    const note = allNotes.find(n => n.id === activeNoteId);
+                    if (note) {
+                        downloadNoteAsPdf(note);
                     }
+                } else {
+                    alert('No active note to download. Please select a note first.');
                 }
             });
 
-            renderNotesList();
-            if (activeNoteId) {
-                loadNoteIntoEditor(activeNoteId);
-            } else if (allNotes.length > 0) {
-                loadNoteIntoEditor(allNotes[0].id);
-            } else {
-                editor.setContents([{ insert: 'Welcome to your Study Hub Notes! Click "New Note" to get started.' }]);
-                currentNoteTitleDisplay.textContent = 'Not Loaded';
+            function downloadNoteAsPdf(note) {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+                
+                // Add title
+                doc.setFontSize(20);
+                doc.text(note.title, 20, 30);
+                
+                // Add creation date
+                doc.setFontSize(12);
+                const createdDate = new Date(note.createdAt).toLocaleDateString();
+                doc.text(`Created: ${createdDate}`, 20, 45);
+                
+                // Get plain text content from editor
+                const plainText = editor.getText();
+                
+                // Add content with text wrapping
+                doc.setFontSize(11);
+                const splitText = doc.splitTextToSize(plainText, 170);
+                doc.text(splitText, 20, 60);
+                
+                // Save the PDF
+                doc.save(`${note.title}.pdf`);
             }
 
-
-            // --- PDF Notes ---
+            // --- PDF Upload Functionality ---
+            let pdfs = JSON.parse(localStorage.getItem('pdfs')) || [];
             const pdfUploadInput = document.getElementById('pdfUploadInput');
             const uploadPdfBtn = document.getElementById('uploadPdfBtn');
             const pdfList = document.getElementById('pdfList');
+            // <CHANGE> Added subject selection elements
+            const pdfSubjectSelect = document.getElementById('pdfSubjectSelect');
+            const customSubjectInput = document.getElementById('customSubjectInput');
 
-            let pdfs = JSON.parse(localStorage.getItem('pdfs')) || [];
+            // <CHANGE> Show/hide custom subject input based on selection
+            pdfSubjectSelect.addEventListener('change', () => {
+                if (pdfSubjectSelect.value === 'Other') {
+                    customSubjectInput.style.display = 'block';
+                    customSubjectInput.required = true;
+                } else {
+                    customSubjectInput.style.display = 'none';
+                    customSubjectInput.required = false;
+                    customSubjectInput.value = '';
+                }
+            });
+
+            uploadPdfBtn.addEventListener('click', () => {
+                const file = pdfUploadInput.files[0];
+                let subject = pdfSubjectSelect.value;
+                
+                if (!file) {
+                    alert('Please select a PDF file to upload.');
+                    return;
+                }
+
+                if (!subject) {
+                    alert('Please select a subject for the PDF.');
+                    return;
+                }
+
+                if (subject === 'Other') {
+                    subject = customSubjectInput.value.trim();
+                    if (!subject) {
+                        alert('Please enter a custom subject name.');
+                        return;
+                    }
+                }
+
+                if (file.type !== 'application/pdf') {
+                    alert('Please select a valid PDF file.');
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const pdfData = {
+                        id: generateUniqueId(),
+                        name: file.name,
+                        subject: subject,
+                        data: e.target.result,
+                        uploadedAt: new Date().toISOString()
+                    };
+
+                    pdfs.push(pdfData);
+                    localStorage.setItem('pdfs', JSON.stringify(pdfs));
+                    renderPdfs();
+                    // <CHANGE> Update PDF viewer when new PDF is uploaded
+                    renderPdfViewer();
+                    pdfUploadInput.value = '';
+                    pdfSubjectSelect.value = '';
+                    customSubjectInput.style.display = 'none';
+                    customSubjectInput.value = '';
+                    alert('PDF uploaded successfully!');
+                };
+                reader.readAsDataURL(file);
+            });
 
             function renderPdfs() {
-                pdfList.innerHTML = '';
                 if (pdfs.length === 0) {
                     pdfList.innerHTML = '<p class="placeholder-text">No PDFs uploaded yet.</p>';
                     return;
                 }
-                pdfs.forEach((pdf, index) => {
-                    const li = document.createElement('li');
-                    li.innerHTML = `
-                        <span>${pdf.name}</span>
+
+                pdfList.innerHTML = '';
+                pdfs.forEach(pdf => {
+                    const pdfItem = document.createElement('div');
+                    pdfItem.className = 'pdf-item';
+                    pdfItem.innerHTML = `
+                        <div class="pdf-info">
+                            <strong>${pdf.name}</strong>
+                            <span class="pdf-subject">${pdf.subject}</span>
+                            <small>Uploaded: ${new Date(pdf.uploadedAt).toLocaleDateString()}</small>
+                        </div>
                         <div class="pdf-actions">
-                            <button class="view-pdf-btn action-btn small-btn" data-index="${index}"><i class="fas fa-eye"></i> View</button>
-                            <button class="delete-pdf-btn action-btn small-btn delete-btn" data-index="${index}"><i class="fas fa-trash"></i> Delete</button>
+                            <button class="action-btn small-btn view-pdf-btn" data-pdf-id="${pdf.id}">
+                                <i class="fas fa-eye"></i> View
+                            </button>
+                            <button class="delete-btn small-btn" data-pdf-id="${pdf.id}">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
                         </div>
                     `;
-                    pdfList.appendChild(li);
+                    pdfList.appendChild(pdfItem);
+                });
+
+                document.querySelectorAll('.view-pdf-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const pdfId = btn.getAttribute('data-pdf-id');
+                        const pdf = pdfs.find(p => p.id === pdfId);
+                        if (pdf) {
+                            window.open(pdf.data, '_blank');
+                        }
+                    });
+                });
+
+                document.querySelectorAll('.pdf-item .delete-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const pdfId = btn.getAttribute('data-pdf-id');
+                        if (confirm('Are you sure you want to delete this PDF?')) {
+                            pdfs = pdfs.filter(pdf => pdf.id !== pdfId);
+                            localStorage.setItem('pdfs', JSON.stringify(pdfs));
+                            renderPdfs();
+                            // <CHANGE> Update PDF viewer when PDF is deleted
+                            renderPdfViewer();
+                        }
+                    });
                 });
             }
 
-            uploadPdfBtn.addEventListener('click', () => {
-                const file = pdfUploadInput.files[0];
-                if (file && file.type === 'application/pdf') {
-                    if (file.size > 5 * 1024 * 1024) {
-                        alert('Warning: This PDF is very large. Storing large files in local storage may cause performance issues or exceed limits. For persistent storage, a backend server is recommended.');
-                    }
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        const base64Pdf = e.target.result;
-                        pdfs.push({ name: file.name, data: base64Pdf });
-                        localStorage.setItem('pdfs', JSON.stringify(pdfs));
-                        renderPdfs();
-                        pdfUploadInput.value = '';
-                        alert('PDF uploaded (to local storage)!');
-                    };
-                    reader.readAsDataURL(file);
-                } else {
-                    alert('Please select a PDF file.');
+            // <CHANGE> Added PDF Viewer functionality
+            const pdfSubjectCategories = document.getElementById('pdfSubjectCategories');
+            const pdfViewerDisplay = document.getElementById('pdfViewerDisplay');
+            const subjectFilterSelect = document.getElementById('subjectFilterSelect');
+
+            function renderPdfViewer() {
+                if (pdfs.length === 0) {
+                    pdfSubjectCategories.innerHTML = '<p class="placeholder-text">No PDFs uploaded yet. Upload PDFs from the Notes section to view them here!</p>';
+                    updateSubjectFilter();
+                    return;
                 }
+
+                // Group PDFs by subject
+                const pdfsBySubject = {};
+                pdfs.forEach(pdf => {
+                    if (!pdfsBySubject[pdf.subject]) {
+                        pdfsBySubject[pdf.subject] = [];
+                    }
+                    pdfsBySubject[pdf.subject].push(pdf);
+                });
+
+                // Render categories
+                pdfSubjectCategories.innerHTML = '';
+                Object.keys(pdfsBySubject).forEach(subject => {
+                    const categoryDiv = document.createElement('div');
+                    categoryDiv.className = 'pdf-category';
+                    categoryDiv.innerHTML = `
+                        <h3 class="category-title">${subject} (${pdfsBySubject[subject].length})</h3>
+                        <div class="category-pdfs">
+                            ${pdfsBySubject[subject].map(pdf => `
+                                <div class="pdf-card" data-pdf-id="${pdf.id}">
+                                    <div class="pdf-card-icon">
+                                        <i class="fas fa-file-pdf"></i>
+                                    </div>
+                                    <div class="pdf-card-info">
+                                        <div class="pdf-card-name">${pdf.name}</div>
+                                        <div class="pdf-card-date">${new Date(pdf.uploadedAt).toLocaleDateString()}</div>
+                                    </div>
+                                    <div class="pdf-card-actions">
+                                        <button class="icon-button view-pdf-viewer-btn" data-pdf-id="${pdf.id}" title="View in viewer">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="icon-button open-pdf-btn" data-pdf-id="${pdf.id}" title="Open in new tab">
+                                            <i class="fas fa-external-link-alt"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                    pdfSubjectCategories.appendChild(categoryDiv);
+                });
+
+                // Add event listeners for PDF cards
+                document.querySelectorAll('.view-pdf-viewer-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const pdfId = btn.getAttribute('data-pdf-id');
+                        viewPdfInViewer(pdfId);
+                    });
+                });
+
+                document.querySelectorAll('.open-pdf-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const pdfId = btn.getAttribute('data-pdf-id');
+                        const pdf = pdfs.find(p => p.id === pdfId);
+                        if (pdf) {
+                            window.open(pdf.data, '_blank');
+                        }
+                    });
+                });
+
+                updateSubjectFilter();
+            }
+
+            function updateSubjectFilter() {
+                const subjects = [...new Set(pdfs.map(pdf => pdf.subject))];
+                subjectFilterSelect.innerHTML = '<option value="">All Subjects</option>';
+                subjects.forEach(subject => {
+                    const option = document.createElement('option');
+                    option.value = subject;
+                    option.textContent = subject;
+                    subjectFilterSelect.appendChild(option);
+                });
+            }
+
+            function viewPdfInViewer(pdfId) {
+                const pdf = pdfs.find(p => p.id === pdfId);
+                if (pdf) {
+                    pdfViewerDisplay.innerHTML = `
+                        <div class="pdf-viewer-header">
+                            <h3>${pdf.name}</h3>
+                            <div class="pdf-viewer-actions">
+                                <button class="action-btn" onclick="window.open('${pdf.data}', '_blank')">
+                                    <i class="fas fa-external-link-alt"></i> Open in New Tab
+                                </button>
+                                <button class="action-btn" onclick="downloadPdf('${pdf.id}')">
+                                    <i class="fas fa-download"></i> Download
+                                </button>
+                            </div>
+                        </div>
+                        <iframe src="${pdf.data}" width="100%" height="600px" style="border: 1px solid var(--border-color); border-radius: 8px;"></iframe>
+                    `;
+                }
+            }
+
+            // Global function for downloading PDF
+            window.downloadPdf = function(pdfId) {
+                const pdf = pdfs.find(p => p.id === pdfId);
+                if (pdf) {
+                    const link = document.createElement('a');
+                    link.href = pdf.data;
+                    link.download = pdf.name;
+                    link.click();
+                }
+            };
+
+            subjectFilterSelect.addEventListener('change', () => {
+                const selectedSubject = subjectFilterSelect.value;
+                const categories = document.querySelectorAll('.pdf-category');
+                
+                categories.forEach(category => {
+                    const categoryTitle = category.querySelector('.category-title').textContent;
+                    if (selectedSubject === '' || categoryTitle.startsWith(selectedSubject)) {
+                        category.style.display = 'block';
+                    } else {
+                        category.style.display = 'none';
+                    }
+                });
             });
 
-            pdfList.addEventListener('click', (event) => {
-                if (event.target.classList.contains('view-pdf-btn') || event.target.closest('.view-pdf-btn')) {
-                    const index = event.target.dataset.index || event.target.closest('.view-pdf-btn').dataset.index;
-                    const pdfData = pdfs[index].data;
-                    const newWindow = window.open();
-                    newWindow.document.write(`<iframe src="${pdfData}" style="width:100%; height:100vh;" frameborder="0"></iframe>`);
-                    newWindow.document.close();
-                } else if (event.target.classList.contains('delete-pdf-btn') || event.target.closest('.delete-pdf-btn')) {
-                    const index = event.target.dataset.index || event.target.closest('.delete-pdf-btn').dataset.index;
-                    if (confirm(`Are you sure you want to delete "${pdfs[index].name}"?`)) {
-                        pdfs.splice(index, 1);
-                        localStorage.setItem('pdfs', JSON.stringify(pdfs));
-                        renderPdfs();
-                        alert('PDF deleted.');
-                    }
-                }
-            });
-
-            renderPdfs();
-
-
-            // --- To-Do List Functionality (Updated for Courses) ---
+            // --- To-Do List Functionality ---
             const todoInput = document.getElementById('todoInput');
             const addTodoItemBtn = document.getElementById('addTodoItemBtn');
             const todoList = document.getElementById('todoList');
             let todos = JSON.parse(localStorage.getItem('todos')) || [];
 
             function renderTodos() {
-                todoList.innerHTML = '';
                 if (todos.length === 0) {
                     todoList.innerHTML = '<p class="placeholder-text">No to-do items yet.</p>';
                     return;
                 }
+
+                todoList.innerHTML = '';
                 todos.forEach((todo, index) => {
                     const li = document.createElement('li');
                     li.innerHTML = `
                         <span>${todo.task}</span>
-                        ${todo.course ? `<span class="course-tag">${todo.course}</span>` : ''}
                         <div class="actions">
                             <button class="delete-todo-btn action-btn small-btn delete-btn" data-index="${index}"><i class="fas fa-trash"></i></button>
                         </div>
@@ -722,8 +923,7 @@
             addTodoItemBtn.addEventListener('click', () => {
                 const todoText = todoInput.value.trim();
                 if (todoText) {
-                    const course = prompt("Enter the course for this to-do (optional):");
-                    todos.push({ task: todoText, course: course ? course.trim() : null });
+                    todos.push({ task: todoText });
                     localStorage.setItem('todos', JSON.stringify(todos));
                     renderTodos();
                     todoInput.value = '';
@@ -740,9 +940,6 @@
                     }
                 }
             });
-
-            renderTodos();
-
 
             // --- Timetable Functionality ---
             const timetableTableBody = document.querySelector('.timetable-table tbody');
@@ -810,10 +1007,7 @@
                 alert('Timetable saved!');
             });
 
-            loadTimetable();
-
-
-            // --- Homework Section (Updated for Courses and Notifications) ---
+            // --- Homework Section ---
             const homeworkInput = document.getElementById('homeworkInput');
             const homeworkDueDateInput = document.getElementById('homeworkDueDate');
             const addHomeworkItemBtn = document.getElementById('addHomeworkItemBtn');
@@ -822,16 +1016,16 @@
             let homeworks = JSON.parse(localStorage.getItem('homeworks')) || [];
 
             function renderHomeworks() {
-                homeworkList.innerHTML = '';
                 if (homeworks.length === 0) {
                     homeworkList.innerHTML = '<p class="placeholder-text">No homework assigned yet.</p>';
                     return;
                 }
+
+                homeworkList.innerHTML = '';
                 homeworks.forEach((hw, index) => {
                     const li = document.createElement('li');
                     li.innerHTML = `
                         <span>${hw.task} (Due: ${hw.dueDate})</span>
-                        ${hw.course ? `<span class="course-tag">${hw.course}</span>` : ''}
                         <div class="actions">
                             <button class="delete-homework-btn action-btn small-btn delete-btn" data-index="${index}"><i class="fas fa-trash"></i></button>
                         </div>
@@ -840,40 +1034,13 @@
                 });
             }
 
-            function requestNotificationPermission() {
-                if (!("Notification" in window)) {
-                    alert("This browser does not support desktop notification.");
-                } else if (Notification.permission !== "denied") {
-                    Notification.requestPermission();
-                }
-            }
-
-            function scheduleNotification(task, date) {
-                if (Notification.permission === "granted") {
-                    const dueDate = new Date(date + "T09:00:00"); // Set time to 9 AM for the reminder
-                    const now = new Date();
-                    const timeDifference = dueDate.getTime() - now.getTime();
-
-                    if (timeDifference > 0) {
-                        setTimeout(() => {
-                            new Notification("Homework Reminder", {
-                                body: `Your homework for "${task}" is due today!`,
-                            });
-                        }, timeDifference);
-                    }
-                }
-            }
-
             addHomeworkItemBtn.addEventListener('click', () => {
                 const task = homeworkInput.value.trim();
                 const dueDate = homeworkDueDateInput.value;
                 if (task && dueDate) {
-                    const course = prompt("Enter the course for this homework (optional):");
-                    homeworks.push({ task, dueDate, course: course ? course.trim() : null });
+                    homeworks.push({ task, dueDate });
                     localStorage.setItem('homeworks', JSON.stringify(homeworks));
                     renderHomeworks();
-                    requestNotificationPermission();
-                    scheduleNotification(task, dueDate);
                     homeworkInput.value = '';
                     homeworkDueDateInput.value = '';
                 } else {
@@ -892,9 +1059,6 @@
                 }
             });
 
-            renderHomeworks();
-
-
             // --- Links Section ---
             const linkNameInput = document.getElementById('linkNameInput');
             const linkUrlInput = document.getElementById('linkUrlInput');
@@ -904,11 +1068,12 @@
             let links = JSON.parse(localStorage.getItem('links')) || [];
 
             function renderLinks() {
-                linksList.innerHTML = '';
                 if (links.length === 0) {
                     linksList.innerHTML = '<p class="placeholder-text">No links saved yet.</p>';
                     return;
                 }
+
+                linksList.innerHTML = '';
                 links.forEach((link, index) => {
                     const li = document.createElement('li');
                     li.innerHTML = `
@@ -945,9 +1110,6 @@
                     }
                 }
             });
-
-            renderLinks();
-
 
             // --- Pomodoro Timer Functionality ---
             const pomodoroTimerDisplay = document.getElementById('pomodoroTimerDisplay');
@@ -1020,68 +1182,31 @@
                 pauseTimerBtn.classList.add('hidden');
             }
 
-            startTimerBtn.addEventListener('click', startTimer);
-            pauseTimerBtn.addEventListener('click', pauseTimer);
-            resetTimerBtn.addEventListener('click', resetTimer);
-
-
-            // --- Backup & Restore Functionality (Updated for Single Note Export) ---
+            // --- Backup & Restore Functionality ---
             const exportDataBtn = document.getElementById('exportDataBtn');
             const importFileInput = document.getElementById('importFileInput');
             const importDataBtn = document.getElementById('importDataBtn');
 
             exportDataBtn.addEventListener('click', () => {
-                const choice = prompt("What would you like to export? Type 'all' for all data or 'note' for a specific note.");
-
-                if (choice && choice.toLowerCase() === 'note') {
-                    const notes = JSON.parse(localStorage.getItem('allNotes')) || [];
-                    if (notes.length === 0) {
-                        alert("You don't have any notes to export.");
-                        return;
-                    }
-
-                    const noteTitles = notes.map(note => note.title).join('\n- ');
-                    const noteTitleToExport = prompt(`Enter the title of the note you want to export:\n\nNotes available:\n- ${noteTitles}`);
-
-                    if (noteTitleToExport) {
-                        const noteToExport = notes.find(note => note.title === noteTitleToExport.trim());
-                        if (noteToExport) {
-                            const dataStr = JSON.stringify({ singleNote: noteToExport }, null, 2);
-                            const blob = new Blob([dataStr], { type: 'application/json' });
-                            const url = URL.createObjectURL(blob);
-                            const a = document.createElement('a');
-                            a.href = url;
-                            a.download = `${noteToExport.title}-note-backup.json`;
-                            document.body.appendChild(a);
-                            a.click();
-                            document.body.removeChild(a);
-                            URL.revokeObjectURL(url);
-                            alert(`Note "${noteToExport.title}" exported successfully!`);
-                        } else {
-                            alert("Note not found. Please check the title and try again.");
-                        }
-                    }
-                } else {
-                    const allData = {
-                        allNotes: JSON.parse(localStorage.getItem('allNotes')) || [],
-                        todos: JSON.parse(localStorage.getItem('todos')) || [],
-                        timetable: JSON.parse(localStorage.getItem('timetable')) || [],
-                        homeworks: JSON.parse(localStorage.getItem('homeworks')) || [],
-                        links: JSON.parse(localStorage.getItem('links')) || [],
-                        pdfs: JSON.parse(localStorage.getItem('pdfs')) || [],
-                    };
-                    const dataStr = JSON.stringify(allData, null, 2);
-                    const blob = new Blob([dataStr], { type: 'application/json' });
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = 'study-hub-backup.json';
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
-                    URL.revokeObjectURL(url);
-                    alert('All data exported successfully!');
-                }
+                const allData = {
+                    allNotes: JSON.parse(localStorage.getItem('allNotes')) || [],
+                    todos: JSON.parse(localStorage.getItem('todos')) || [],
+                    timetable: JSON.parse(localStorage.getItem('timetable')) || [],
+                    homeworks: JSON.parse(localStorage.getItem('homeworks')) || [],
+                    links: JSON.parse(localStorage.getItem('links')) || [],
+                    pdfs: JSON.parse(localStorage.getItem('pdfs')) || [],
+                };
+                const dataStr = JSON.stringify(allData, null, 2);
+                const blob = new Blob([dataStr], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'study-hub-backup.json';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                alert('All data exported successfully!');
             });
 
             importDataBtn.addEventListener('click', () => {
@@ -1092,30 +1217,14 @@
                         try {
                             const importedData = JSON.parse(e.target.result);
                             if (confirm("Are you sure you want to import this data? This will overwrite your current data!")) {
-                                if (importedData.singleNote) {
-                                    const note = importedData.singleNote;
-                                    let notes = JSON.parse(localStorage.getItem('allNotes')) || [];
-                                    const existingNoteIndex = notes.findIndex(n => n.id === note.id);
-                                    if (existingNoteIndex > -1) {
-                                        if (confirm("A note with the same ID already exists. Do you want to overwrite it?")) {
-                                            notes[existingNoteIndex] = note;
-                                        }
-                                    } else {
-                                        notes.push(note);
-                                    }
-                                    localStorage.setItem('allNotes', JSON.stringify(notes));
-                                    reloadAllData();
-                                    alert('Single note imported successfully!');
-                                } else {
-                                    localStorage.setItem('allNotes', JSON.stringify(importedData.allNotes || []));
-                                    localStorage.setItem('todos', JSON.stringify(importedData.todos || []));
-                                    localStorage.setItem('timetable', JSON.stringify(importedData.timetable || []));
-                                    localStorage.setItem('homeworks', JSON.stringify(importedData.homeworks || []));
-                                    localStorage.setItem('links', JSON.stringify(importedData.links || []));
-                                    localStorage.setItem('pdfs', JSON.stringify(importedData.pdfs || []));
-                                    reloadAllData();
-                                    alert('All data imported successfully!');
-                                }
+                                localStorage.setItem('allNotes', JSON.stringify(importedData.allNotes || []));
+                                localStorage.setItem('todos', JSON.stringify(importedData.todos || []));
+                                localStorage.setItem('timetable', JSON.stringify(importedData.timetable || []));
+                                localStorage.setItem('homeworks', JSON.stringify(importedData.homeworks || []));
+                                localStorage.setItem('links', JSON.stringify(importedData.links || []));
+                                localStorage.setItem('pdfs', JSON.stringify(importedData.pdfs || []));
+                                reloadAllData();
+                                alert('All data imported successfully!');
                             }
                         } catch (error) {
                             alert('Failed to parse JSON file. Please make sure the file is a valid backup file.');
@@ -1126,6 +1235,25 @@
                     alert('Please select a JSON file to import.');
                 }
             });
+
+            // Initialize the app
+            renderNotesList();
+            if (activeNoteId) {
+                loadNoteIntoEditor(activeNoteId);
+            } else if (allNotes.length > 0) {
+                loadNoteIntoEditor(allNotes[0].id);
+            } else {
+                editor.setContents([{ insert: 'Welcome to your Study Hub Notes! Click "New Note" to create one!' }]);
+                currentNoteTitleDisplay.textContent = 'Not Loaded';
+            }
+
+            renderPdfs();
+            renderTodos();
+            loadTimetable();
+            renderHomeworks();
+            renderLinks();
+            // <CHANGE> Initialize PDF viewer
+            renderPdfViewer();
         });
     </script>
 </body>
