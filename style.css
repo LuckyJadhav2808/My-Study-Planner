@@ -338,17 +338,35 @@ input[type="file"] {
   margin-top: 1rem;
 }
 
-/* Set height to auto to allow the editor to grow with content */
-#editor .ql-editor {
-  min-height: 200px;
-  height: auto;
-  overflow-y: hidden;
-  font-family: "Poppins", sans-serif;
-  font-size: 1rem;
-  line-height: 1.6;
-  color: var(--text-color);
+/* === ADDED TO FIX QUIll TOOLBAR STICKY ISSUE === */
+.ql-toolbar.ql-snow {
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  border-bottom: 1px solid var(--border-color);
+  position: sticky; /* Make the toolbar sticky */
+  top: 0; /* Stick it to the top of its container */
+  z-index: 1; /* Ensure it stays on top of the note content */
+  background-color: var(--card-bg-color); /* Add a background color to prevent content from showing through */
 }
 
+.ql-container.ql-snow {
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+  /* Add padding to prevent content from being hidden behind the sticky toolbar */
+  padding-top: 50px; /* Adjust this value if the toolbar height changes */
+  /* Remove the top border, as it's now handled by the toolbar */
+  border-top: none;
+}
+
+.dark-mode .ql-toolbar.ql-snow {
+  background-color: var(--card-bg-color);
+  border-color: #3e4453;
+}
+
+.dark-mode .ql-container.ql-snow {
+  border-color: #3e4453;
+}
+/* === END OF ADDED CODE === */
 .note-actions button.delete-btn {
   color: var(--accent-color);
 }
@@ -828,3 +846,4 @@ input[type="file"] {
     justify-content: flex-start;
   }
 }
+
