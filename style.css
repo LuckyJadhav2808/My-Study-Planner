@@ -1,17 +1,14 @@
-/*
- * Google Fonts: Poppins
- * A modern, geometric sans-serif font
- */
+
 @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap");
 
-/* === General Styles & Variables === */
+
 :root {
-  --primary-color: #4c5b75; /* A sophisticated dark blue-gray */
-  --secondary-color: #34c38f; /* A vibrant green for highlights */
-  --accent-color: #e65252; /* A soft red for danger actions */
+  --primary-color: #4c5b75;
+  --secondary-color: #34c38f;
+  --accent-color: #e65252; 
   --text-color: #343a40;
   --text-light-color: #c0c7d1;
-  --bg-color: #f0f2f5; /* A very light, clean background */
+  --bg-color: #f0f2f5; 
   --card-bg-color: #ffffff;
   --sidebar-bg-color: #ffffff;
   --border-color: #e9ecef;
@@ -19,7 +16,7 @@
   --shadow-hover: 0 6px 18px rgba(0, 0, 0, 0.1);
 }
 
-/* Dark mode variables */
+
 .dark-mode {
   --primary-color: #34c38f;
   --secondary-color: #4c5b75;
@@ -51,7 +48,7 @@ body {
   padding: 1rem;
 }
 
-/* === Header === */
+
 .header {
   display: flex;
   justify-content: space-between;
@@ -91,16 +88,16 @@ body {
 }
 
 .menu-toggle-btn {
-  display: none; /* Hide on larger screens */
+  display: none; 
 }
 
-/* === Main Layout (Sidebar + Content) === */
+
 .main-layout {
   display: flex;
   gap: 1.5rem;
 }
 
-/* === Sidebar Navigation === */
+
 .sidebar {
   width: 250px;
   background-color: var(--sidebar-bg-color);
@@ -149,7 +146,7 @@ body {
   background-color: #3e4453;
 }
 
-/* === Main Content & Sections === */
+
 main.content {
   flex-grow: 1;
   background-color: var(--card-bg-color);
@@ -182,7 +179,7 @@ main.content {
   color: var(--primary-color);
 }
 
-/* === Buttons & Inputs === */
+
 .action-btn,
 .add-new-btn {
   background-color: var(--primary-color);
@@ -243,13 +240,13 @@ input[type="file"] {
   box-shadow: 0 0 0 2px rgba(85, 110, 230, 0.2);
 }
 
-/* === Lists and Cards === */
+
 .styled-list {
   list-style: none;
   padding: 0;
 }
 
-/* This rule is for all general lists (To-Do, Homework, Links) */
+
 .styled-list li {
   display: flex;
   justify-content: space-between;
@@ -265,7 +262,7 @@ input[type="file"] {
   gap: 10px;
 }
 
-/* This rule specifically targets the notes list and removes the box styling */
+
 .notes-list li {
   background-color: transparent;
   box-shadow: none;
@@ -277,17 +274,17 @@ input[type="file"] {
   transition: border-left 0.2s;
 }
 
-/* New style for the active note to make it look like a selected menu item */
+
 .notes-list .note-item.active-note {
   background-color: transparent;
   box-shadow: none;
   transform: none;
   border-left: 4px solid var(--secondary-color);
   color: var(--secondary-color);
-  padding-left: calc(0.5rem - 4px); /* Corrects padding for border */
+  padding-left: calc(0.5rem - 4px); 
 }
 
-/* Styles for note actions inside the list */
+
 .note-item {
   display: flex;
   justify-content: space-between;
@@ -327,34 +324,34 @@ input[type="file"] {
   color: var(--accent-color);
 }
 
-/* === Notes Editor Styling === */
+
 #editor {
   border: 1px solid var(--border-color);
   border-radius: 8px;
-  /* Reduced minimum height */
+  
   min-height: 200px;
   background-color: var(--card-bg-color);
   color: var(--text-color);
   margin-top: 1rem;
 }
 
-/* === ADDED TO FIX QUIll TOOLBAR STICKY ISSUE === */
+
 .ql-toolbar.ql-snow {
   border-top-left-radius: 8px;
   border-top-right-radius: 8px;
   border-bottom: 1px solid var(--border-color);
-  position: sticky; /* Make the toolbar sticky */
-  top: 0; /* Stick it to the top of its container */
-  z-index: 1; /* Ensure it stays on top of the note content */
-  background-color: var(--card-bg-color); /* Add a background color to prevent content from showing through */
+  position: sticky; 
+  top: 0;
+  z-index: 1;
+  background-color: var(--card-bg-color); 
 }
 
 .ql-container.ql-snow {
   border-bottom-left-radius: 8px;
   border-bottom-right-radius: 8px;
-  /* Add padding to prevent content from being hidden behind the sticky toolbar */
-  padding-top: 50px; /* Adjust this value if the toolbar height changes */
-  /* Remove the top border, as it's now handled by the toolbar */
+  
+  padding-top: 50px;
+  
   border-top: none;
 }
 
@@ -366,12 +363,12 @@ input[type="file"] {
 .dark-mode .ql-container.ql-snow {
   border-color: #3e4453;
 }
-/* === END OF ADDED CODE === */
+
 .note-actions button.delete-btn {
   color: var(--accent-color);
 }
 
-/* Course Tag */
+
 .course-tag {
   background-color: var(--primary-color);
   color: white;
@@ -390,7 +387,7 @@ input[type="file"] {
   color: var(--primary-color);
 }
 
-/* === PDF Upload Controls === */
+
 .pdf-upload-controls {
   display: flex;
   flex-wrap: wrap;
@@ -405,7 +402,7 @@ input[type="file"] {
   min-width: 150px;
 }
 
-/* === PDF Items === */
+
 .pdf-item {
   display: flex;
   justify-content: space-between;
@@ -438,7 +435,7 @@ input[type="file"] {
   gap: 10px;
 }
 
-/* === PDF Viewer Section === */
+
 .pdf-viewer-container {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -543,14 +540,13 @@ input[type="file"] {
   gap: 1rem;
 }
 
-/* === Note Actions Bar === */
+
 .note-actions-bar {
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
 }
 
-/* === Timetable === */
 .timetable-grid {
   overflow-x: auto;
 }
@@ -581,7 +577,7 @@ input[type="file"] {
   background-color: var(--bg-color);
 }
 
-/* === Calculator Modal === */
+
 .modal {
   display: none;
   position: fixed;
@@ -669,7 +665,7 @@ input[type="file"] {
   grid-column: span 2;
 }
 
-/* === Pomodoro Timer Styles === */
+
 .timer-display-container {
   text-align: center;
   margin-bottom: 2rem;
@@ -730,7 +726,7 @@ input[type="file"] {
   text-align: center;
 }
 
-/* === Utility Classes === */
+
 .mt-15 {
   margin-top: 15px;
 }
@@ -757,10 +753,10 @@ input[type="file"] {
   display: none;
 }
 
-/* === Responsive Design for Mobile === */
+
 @media (max-width: 768px) {
   body {
-    padding-bottom: 4rem; /* Add space for the bottom nav */
+    padding-bottom: 4rem; 
   }
 
   .main-layout {
@@ -779,7 +775,7 @@ input[type="file"] {
   }
 
   .menu-toggle-btn {
-    display: block; /* Show menu toggle button on mobile */
+    display: block; 
   }
 
   .sidebar {
@@ -846,4 +842,5 @@ input[type="file"] {
     justify-content: flex-start;
   }
 }
+
 
