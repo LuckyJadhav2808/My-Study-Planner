@@ -13,7 +13,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-    <!-- <CHANGE> Added jsPDF library for PDF generation -->
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
@@ -55,7 +55,7 @@
                     <i class="fas fa-clock"></i>
                     <span>Pomodoro</span>
                 </button>
-                <!-- <CHANGE> Added PDF Viewer navigation button -->
+               
                 <button class="nav-button" data-target="pdfViewerSection">
                     <i class="fas fa-file-pdf"></i>
                     <span>PDF Viewer</span>
@@ -81,14 +81,14 @@
                         <div id="editor"></div>
                         <div class="note-actions-bar mt-15">
                             <button id="saveCurrentNoteBtn" class="action-btn save-btn"><i class="fas fa-save"></i> Save Note</button>
-                            <!-- <CHANGE> Added download PDF button for current note -->
+                            
                             <button id="downloadNotePdfBtn" class="action-btn"><i class="fas fa-download"></i> Download as PDF</button>
                         </div>
                         <p class="small-text">Notes are saved in your browser's local storage.</p>
                         <h3 class="mt-30">PDF Notes (Local Storage - Limited Capacity)</h3>
                         <div class="pdf-upload-area">
                             <p>Upload your PDF notes here:</p>
-                            <!-- <CHANGE> Added subject selection for PDF upload -->
+                            
                             <div class="pdf-upload-controls">
                                 <select id="pdfSubjectSelect" class="text-input">
                                     <option value="">Select Subject</option>
@@ -112,7 +112,7 @@
                     </div>
                 </section>
 
-                <!-- <CHANGE> Added new PDF Viewer section -->
+               
                 <section id="pdfViewerSection" class="section">
                     <div class="section-header">
                         <h2>📄 PDF Viewer</h2>
@@ -314,7 +314,7 @@
                 renderHomeworks();
                 renderLinks();
                 loadDarkModePreference();
-                // <CHANGE> Added PDF viewer rendering to reload function
+        
                 renderPdfViewer();
                 alert('All data reloaded!');
             }
@@ -624,20 +624,20 @@
                 doc.setFontSize(20);
                 doc.text(note.title, 20, 30);
                 
-                // Add creation date
+                
                 doc.setFontSize(12);
                 const createdDate = new Date(note.createdAt).toLocaleDateString();
                 doc.text(`Created: ${createdDate}`, 20, 45);
                 
-                // Get plain text content from editor
+               
                 const plainText = editor.getText();
                 
-                // Add content with text wrapping
+               
                 doc.setFontSize(11);
                 const splitText = doc.splitTextToSize(plainText, 170);
                 doc.text(splitText, 20, 60);
                 
-                // Save the PDF
+              
                 doc.save(`${note.title}.pdf`);
             }
 
@@ -646,11 +646,11 @@
             const pdfUploadInput = document.getElementById('pdfUploadInput');
             const uploadPdfBtn = document.getElementById('uploadPdfBtn');
             const pdfList = document.getElementById('pdfList');
-            // <CHANGE> Added subject selection elements
+           
             const pdfSubjectSelect = document.getElementById('pdfSubjectSelect');
             const customSubjectInput = document.getElementById('customSubjectInput');
 
-            // <CHANGE> Show/hide custom subject input based on selection
+           
             pdfSubjectSelect.addEventListener('change', () => {
                 if (pdfSubjectSelect.value === 'Other') {
                     customSubjectInput.style.display = 'block';
@@ -702,7 +702,7 @@
                     pdfs.push(pdfData);
                     localStorage.setItem('pdfs', JSON.stringify(pdfs));
                     renderPdfs();
-                    // <CHANGE> Update PDF viewer when new PDF is uploaded
+                    
                     renderPdfViewer();
                     pdfUploadInput.value = '';
                     pdfSubjectSelect.value = '';
@@ -758,14 +758,14 @@
                             pdfs = pdfs.filter(pdf => pdf.id !== pdfId);
                             localStorage.setItem('pdfs', JSON.stringify(pdfs));
                             renderPdfs();
-                            // <CHANGE> Update PDF viewer when PDF is deleted
+                          
                             renderPdfViewer();
                         }
                     });
                 });
             }
 
-            // <CHANGE> Added PDF Viewer functionality
+        
             const pdfSubjectCategories = document.getElementById('pdfSubjectCategories');
             const pdfViewerDisplay = document.getElementById('pdfViewerDisplay');
             const subjectFilterSelect = document.getElementById('subjectFilterSelect');
@@ -1252,9 +1252,10 @@
             loadTimetable();
             renderHomeworks();
             renderLinks();
-            // <CHANGE> Initialize PDF viewer
+            
             renderPdfViewer();
         });
     </script>
 </body>
 </html>
+
