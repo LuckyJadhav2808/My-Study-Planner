@@ -13,6 +13,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
@@ -616,30 +617,51 @@
                 }
             });
 
-            function downloadNoteAsPdf(note) {
-                const { jsPDF } = window.jspdf;
-                const doc = new jsPDF();
-                
-                // Add title
-                doc.setFontSize(20);
-                doc.text(note.title, 20, 30);
-                
-                
-                doc.setFontSize(12);
-                const createdDate = new Date(note.createdAt).toLocaleDateString();
-                doc.text(`Created: ${createdDate}`, 20, 45);
-                
-               
-                const plainText = editor.getText();
-                
-               
-                doc.setFontSize(11);
-                const splitText = doc.splitTextToSize(plainText, 170);
-                doc.text(splitText, 20, 60);
-                
-              
-                doc.save(`${note.title}.pdf`);
-            }
+           function downloadNoteAsPdf(note) {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF('p', 'mm', 'a4');
+    
+    // Define page dimensions and margins
+    const pdfWidth = doc.internal.pageSize.getWidth();
+    const pdfHeight = doc.internal.pageSize.getHeight();
+    const margin = 10;
+    const contentWidth = pdfWidth - 2 * margin;
+
+    const noteContentElement = document.getElementById('editor');
+
+    // Add a title and date to the first page
+    doc.setFontSize(20);
+    doc.text(note.title, margin, margin + 5);
+    doc.setFontSize(10);
+    const createdDate = new Date(note.createdAt).toLocaleDateString();
+    doc.text(`Created: ${createdDate}`, margin, margin + 15);
+
+    // --- The change is in the 'scale' option below ---
+    html2canvas(noteContentElement, { 
+        scale: 3, // Set a higher scale for better resolution
+    }).then(canvas => {
+        const imgData = canvas.toDataURL('image/jpeg');
+        const imgWidth = contentWidth;
+        const imgHeight = canvas.height * imgWidth / canvas.width;
+        let heightLeft = imgHeight;
+        let position = margin + 20;
+
+        // Add the first page
+        doc.addImage(imgData, 'JPEG', margin, position, imgWidth, imgHeight);
+        heightLeft -= (pdfHeight - position);
+        
+        // Loop to add new pages if content is longer
+        while (heightLeft >= 0) {
+            position = heightLeft - imgHeight + margin;
+            doc.addPage();
+            doc.addImage(imgData, 'JPEG', margin, position, imgWidth, imgHeight);
+            heightLeft -= pdfHeight;
+        }
+
+        // Save the PDF
+        doc.save(`${note.title}.pdf`);
+    });
+}
 
             // --- PDF Upload Functionality ---
             let pdfs = JSON.parse(localStorage.getItem('pdfs')) || [];
